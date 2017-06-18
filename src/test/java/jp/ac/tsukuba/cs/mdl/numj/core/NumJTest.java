@@ -1,0 +1,30 @@
+package jp.ac.tsukuba.cs.mdl.numj.core;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+public class NumJTest {
+
+    @Test
+    public void ones() {
+        assertEquals(NumJ.create(new double[]{1, 1, 1, 1}, new int[]{2, 2}), NumJ.ones(2, 2));
+        assertNotEquals(NumJ.create(new double[]{1, 1, 1, 2}, new int[]{2, 2}), NumJ.ones(2, 2));
+    }
+
+    @Test
+    public void zeros(){
+        assertNotEquals(NumJ.create(new double[]{2,2,2,2}, 2,2), NumJ.zeros(2,2));
+        assertEquals(NumJ.create(new double[]{0,0,0,0}, 2,2), NumJ.zeros(2,2));
+    }
+
+    @Test
+    public void elementwise(){
+        assertEquals(NumJ.create(new double[]{2,2,2,2}, 2,2),
+                NumJ.elementwise(NumJ.ones(2,2), NumJ.ones(2,2), (l,r)->l+r));
+
+        assertNotEquals(NumJ.create(new double[]{1,1,1,1}, 2,2),
+                NumJ.elementwise(NumJ.ones(2,2), NumJ.ones(2,2), (l,r)->l+r));
+    }
+}
