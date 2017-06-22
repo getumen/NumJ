@@ -1,16 +1,22 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AtomicDoubleArray;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class NdArrayImpl implements NdArray {
 
-    protected int[] shape;
     protected AtomicDoubleArray data;
+    protected int[] shape;
     protected int dim;
 
 
@@ -167,9 +173,37 @@ public class NdArrayImpl implements NdArray {
         return NumJ.elementwise(this, other, (l, r) -> r == 0 ? Double.POSITIVE_INFINITY : l / r);
     }
 
+    public Pair<Integer[], Integer[]> ndIndex2index(NdIndex[] indices){
+        List<List<Integer>> indexSet = Lists.newArrayList();
+        Integer[] shape = new Integer[dim];
+        for(int i=0;i<indices.length;i++){
+            List<Integer> nIndex = Lists.newArrayList();
+            if(indices[i] instanceof NdIndexAll){
+                nIndex = IntStream.range(0,shape[i]).boxed().collect(Collectors.toList());
+            }else{
+                nIndex.addAll(indices[i].indexes());
+            }
+            shape[i] = nIndex.size();
+            indexSet.add(nIndex);
+        }
+        List<List<Integer>> cartesianProduct = Lists.cartesianProduct(indexSet);
+        Integer[] idx = cartesianProduct.stream().map(e->index(Ints.toArray(e))).toArray(Integer[]::new);
+        return Pair.of(shape, idx);
+    }
+
     @Override
-    public NdArray get(NdIndex indexes) {
-        throw new NotImplementedException("get is not implemented");
+    public NdArray get(NdIndex... indices) {
+        if (indices.length != dim) {
+            throw new IllegalArgumentException("indexes size does not match dimension");
+        }
+        Pair<Integer[], Integer[]> shapeIndex = ndIndex2index(indices);
+        Integer[] shape = shapeIndex.getLeft();
+        Integer[] idx = shapeIndex.getRight();
+        double[] array = new double[idx.length];
+        for(int i=0;i<idx.length;i++){
+                array[i] = data.get(idx[i]);
+        }
+        return new NdArrayImpl(ArrayUtils.toPrimitive(shape), array);
     }
 
     @Override
@@ -430,6 +464,17 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
+    public void put(NdIndex[] indices, NdArray array){
+        Pair<Integer[], Integer[]> shapeIndex = ndIndex2index(indices);
+        Integer[] shape = shapeIndex.getLeft();
+        Integer[] index = shapeIndex.getRight();
+        if(!Arrays.deepEquals(shape, Arrays.stream(array.shape()).boxed().toArray())){
+            throw new IllegalArgumentException("Indices does not match array");
+        }
+        IntStream.range(0, index.length).parallel().forEach(i->data.lazySet(index[i], array.data().get(i)));
+    }
+
+    @Override
     public NdArray ravel() {
         return null;
     }
@@ -509,4 +554,5 @@ public class NdArrayImpl implements NdArray {
     public String toString() {
         return "{" + data + '}';
     }
+
 }

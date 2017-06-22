@@ -74,4 +74,13 @@ public class NumJ {
     public static NdArray zeros(int... shape) {
         return createByNumber(0, shape);
     }
+
+    public static NdArray arange(int num, int... shape) {
+        int size = size(shape);
+        double[] array = new double[size];
+        for (int i = 0; i < size; i++) {
+            array[i] = i;
+        }
+        return new NdArrayImpl(shape, array);
+    }
 }

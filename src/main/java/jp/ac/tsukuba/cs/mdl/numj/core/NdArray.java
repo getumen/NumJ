@@ -43,7 +43,7 @@ public interface NdArray {
 
     NdArray div(Number other);
 
-    NdArray get(NdIndex indexes);
+    NdArray get(NdIndex... indexes);
 
     NdArray getColumn(int column);
 
@@ -143,6 +143,8 @@ public interface NdArray {
     void put(int i, int j, double value);
 
     void put(int[] indexes, double value);
+
+    void put(NdIndex[] indexes, NdArray array);
 
     NdArray ravel();
 

@@ -1,4 +1,4 @@
-NumJ: simple scientific computing library
+NumJ: simple scientific computing library for Java
 -----------------------------
 
 # State

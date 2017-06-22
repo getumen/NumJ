@@ -1,4 +1,10 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-public interface NdIndex {
+import java.util.Collection;
+import java.util.Iterator;
+
+public interface NdIndex extends Iterator<Integer>{
+
+    Collection<Integer> indexes();
+
 }
