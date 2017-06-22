@@ -1,33 +1,23 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Optional;
 
-public class NdIndexInterval implements NdIndex{
+public class NdIndexInterval implements NdIndex {
 
-    protected int start;
-    protected int end;
-    protected int pointer;
+    private int start;
 
-    @Override
-    public Collection<Integer> indexes() {
-        return IntStream.range(start, end).boxed().collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean hasNext() {
-        return pointer < (end - start);
-    }
+    private int end;
 
     public NdIndexInterval(int start, int end) {
         this.start = start;
         this.end = end;
-        pointer = 0;
     }
 
     @Override
-    public Integer next() {
-        return start + pointer;
+    public Optional<Integer> map(Integer i) {
+        if (i < end - start) {
+            return Optional.of(i);
+        }
+        return Optional.empty();
     }
 }

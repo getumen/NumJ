@@ -1,21 +1,12 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import java.util.Collection;
+import java.util.Optional;
 
 public class NdIndexAll implements NdIndex {
 
     @Override
-    public boolean hasNext() {
-        throw new IllegalAccessError();
+    public Optional<Integer> map(Integer i) {
+        return Optional.of(i);
     }
 
-    @Override
-    public Integer next() {
-        throw new IllegalAccessError();
-    }
-
-    @Override
-    public Collection<Integer> indexes() {
-        throw new IllegalAccessError();
-    }
 }

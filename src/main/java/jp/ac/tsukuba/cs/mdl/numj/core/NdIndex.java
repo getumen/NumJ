@@ -1,10 +1,9 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.Optional;
 
-public interface NdIndex extends Iterator<Integer>{
+public interface NdIndex {
 
-    Collection<Integer> indexes();
+    Optional<Integer> map(Integer i);
 
 }

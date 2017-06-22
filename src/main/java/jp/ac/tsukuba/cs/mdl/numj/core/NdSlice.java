@@ -5,7 +5,6 @@ import com.google.common.primitives.Ints;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.stream.Collector;
 
 /**
  * Factory method for NdIndex
@@ -22,10 +21,10 @@ public class NdSlice {
     }
 
     public static NdIndex set(int... set){
-        return new NdIndexSet(Ints.asList(set));
+        return new NdIndexSet(set);
     }
 
-    public static NdIndex set(Iterator<Integer> set){
-        return new NdIndexSet(Lists.newArrayList(set));
+    public static NdIndex set(Collection<Integer> set){
+        return new NdIndexSet(Ints.toArray(set));
     }
 }

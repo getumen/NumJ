@@ -1,31 +1,23 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import java.util.Collection;
-import java.util.List;
+import com.google.common.primitives.Ints;
 
-public class NdIndexSet implements NdIndex{
+import java.util.Optional;
 
-    protected int pointer;
-    protected List<Integer> indexes;
+public class NdIndexSet implements NdIndex {
 
-    public NdIndexSet(List<Integer> indexes) {
-        this.indexes = indexes;
-        pointer = 0;
+    private int[] set;
+
+    public NdIndexSet(int... set) {
+        this.set = set;
     }
 
     @Override
-
-    public Collection<Integer> indexes() {
-        return indexes;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return pointer < indexes.size();
-    }
-
-    @Override
-    public Integer next() {
-        return indexes.get(pointer++);
+    public Optional<Integer> map(Integer i) {
+        if (Ints.contains(set, i)) {
+            return Optional.of(i);
+        } else {
+            return Optional.empty();
+        }
     }
 }

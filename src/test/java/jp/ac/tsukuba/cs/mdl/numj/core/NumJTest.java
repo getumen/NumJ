@@ -20,11 +20,7 @@ public class NumJTest {
     }
 
     @Test
-    public void elementwise(){
-        assertEquals(NumJ.create(new double[]{2,2,2,2}, 2,2),
-                NumJ.elementwise(NumJ.ones(2,2), NumJ.ones(2,2), (l,r)->l+r));
-
-        assertNotEquals(NumJ.create(new double[]{1,1,1,1}, 2,2),
-                NumJ.elementwise(NumJ.ones(2,2), NumJ.ones(2,2), (l,r)->l+r));
+    public void arange(){
+        assertEquals(NumJ.create(new double[]{0,1,2,3},2,2), NumJ.arange(4, 2,2));
     }
 }
