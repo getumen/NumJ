@@ -2,9 +2,11 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class NdIndexer {
@@ -107,7 +109,7 @@ public class NdIndexer {
         return result;
     }
 
-    public int[] pointers() {
+    public int[] getPointers() {
         return pointers;
     }
 
@@ -144,13 +146,30 @@ public class NdIndexer {
         return size;
     }
 
-
     public int[] getShape() {
         int[] shapeView = new int[dim];
         for (int i=0;i<dim;i++){
             shapeView[i] = shape[permutation[i]];
         }
         return shapeView;
+    }
+
+    Map<int[], Integer> pointerMapping(){
+        List<List<Integer>> list = Lists.newArrayList();
+        int[] shapeView = getShape();
+        for(int i=0;i<dim;i++){
+            list.add(
+                    IntStream.range(0, shapeView[i])
+                            .boxed()
+                            .collect(Collectors.toList())
+            );
+        }
+        return Lists.cartesianProduct(list).stream()
+                .map(Ints::toArray)
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        this::pointer
+                ));
     }
 
 

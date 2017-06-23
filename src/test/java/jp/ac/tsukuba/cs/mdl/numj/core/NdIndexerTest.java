@@ -2,7 +2,6 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
@@ -61,7 +60,7 @@ public class NdIndexerTest {
     @Test
     public void pointers() throws Exception {
         NdIndexer indexer = new NdIndexer(new int[]{3,4,5});
-        assertArrayEquals(IntStream.range(0, 3*4*5).toArray(), indexer.pointers());
+        assertArrayEquals(IntStream.range(0, 3*4*5).toArray(), indexer.getPointers());
     }
 
     @Test
@@ -93,7 +92,7 @@ public class NdIndexerTest {
                 new NdIndexInterval(1,4),
                 new NdIndexInterval(1,5)
         });
-        assertEquals(2*3*4, sliceInterval.pointers().length);
+        assertEquals(2*3*4, sliceInterval.getPointers().length);
         assertEquals(2*3*4, sliceInterval.getSize());
         assertEquals(3, sliceInterval.getDim());
         assertArrayEquals(new int[]{2,3,4}, sliceInterval.getShape());

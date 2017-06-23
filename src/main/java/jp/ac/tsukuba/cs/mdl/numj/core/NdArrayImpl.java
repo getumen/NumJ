@@ -1,9 +1,14 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AtomicDoubleArray;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class NdArrayImpl implements NdArray {
@@ -202,17 +207,49 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray transpose() {
-        return null;
+        return new NdArrayImpl(
+                iterator.transpose(
+                        IntStream
+                                .range(0, iterator.getDim())
+                                .map(i -> (i + 1) % iterator.getDim())
+                                .toArray()
+                ),
+                data
+        );
     }
 
     @Override
     public NdArray transpose(int... dim) {
-        return null;
+        return new NdArrayImpl(dim, data);
+    }
+
+    private StringBuffer stringfyMatrix(StringBuffer sb, int index, int[] channel) {
+        final String BR = System.getProperty("line.separator");
+        sb.append("[");
+        if (index == dim() - 2) {
+            sb.append(BR);
+        }
+        for (int i = 0; i < iterator.getShape()[index]; i++) {
+            if (index == dim() - 2) {
+                sb.append("[");
+                for (int j = 0; j < iterator.getShape()[dim() - 1]; j++) {
+                    sb.append(data.get(iterator.pointer(Ints.concat(channel, new int[]{i, j}))));
+                    sb.append(", ");
+                }
+                sb.append("]");
+                sb.append(BR);
+            } else {
+                sb = stringfyMatrix(sb, index + 1, Ints.concat(channel, new int[]{i}));
+            }
+
+        }
+        sb.append("]");
+        return sb;
     }
 
     @Override
     public String toString() {
-        return "{" + data + '}';
+        return stringfyMatrix(new StringBuffer(), 0, new int[0]).toString();
     }
 
 }
