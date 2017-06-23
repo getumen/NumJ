@@ -23,8 +23,10 @@ public class NdIndexer {
 
     private int[] permutation;
 
+    private int[] invPermutation;
+
     public static int computeSize(int[] shape) {
-        return Arrays.stream(shape).reduce((l,r)->l*r).orElse(0);
+        return Arrays.stream(shape).reduce((l, r) -> l * r).orElse(0);
     }
 
     public NdIndexer(int[] shape) {
@@ -40,6 +42,8 @@ public class NdIndexer {
         this.pointers = IntStream.range(0, size).toArray();
 
         permutation = IntStream.range(0, dim).toArray();
+
+        invPermutation = IntStream.range(0, dim).toArray();
     }
 
     public NdIndexer(int[] shape, int[] pointers, int[] permutation) {
@@ -50,16 +54,21 @@ public class NdIndexer {
 
         this.stride = createStride(shape);
 
-        this.permutation=permutation;
+        this.permutation = permutation;
+
+        invPermutation = IntStream.range(0, dim).toArray();
+        for (int i = 0; i < dim; i++) {
+            invPermutation[permutation[i]] = i;
+        }
 
         size = pointers.length;
 
         this.pointers = pointers;
     }
 
-    public NdIndexer transpose(int... permute){
+    public NdIndexer transpose(int... permute) {
         int[] newPermutation = new int[dim];
-        for (int i=0;i<dim;i++){
+        for (int i = 0; i < dim; i++) {
             newPermutation[i] = permutation[permute[i]];
         }
         return new NdIndexer(shape, pointers, newPermutation);
@@ -69,9 +78,9 @@ public class NdIndexer {
         return permutation;
     }
 
-    public NdIndexer reshape(int... shape){
+    public NdIndexer reshape(int... shape) {
         int[] newShape = new int[dim];
-        for (int i=0;i<dim;i++){
+        for (int i = 0; i < dim; i++) {
             newShape[permutation[i]] = shape[i];
         }
         return new NdIndexer(newShape, pointers, permutation);
@@ -82,7 +91,7 @@ public class NdIndexer {
         int[] stride = new int[shape.length];
         stride[shape.length - 1] = 1;
         for (int i = shape.length - 2; i >= 0; i--) {
-            stride[i] = stride[i + 1] * shape[i+1];
+            stride[i] = stride[i + 1] * shape[i + 1];
         }
         return stride;
     }
@@ -100,12 +109,12 @@ public class NdIndexer {
         return pointers[
                 IntStream
                         .range(0, dim)
-                        .map(i -> coordinate[i%shape[permutation[i]]] * stride[permutation[i]])
+                        .map(i -> (coordinate[i] % shape[permutation[i]]) * stride[permutation[i]])
                         .sum()
                 ];
     }
 
-    public int pointerIndex(int pointer){
+    public int pointerIndex(int pointer) {
         return Arrays.binarySearch(pointers, pointer);
     }
 
@@ -157,16 +166,16 @@ public class NdIndexer {
 
     public int[] getShape() {
         int[] shapeView = new int[dim];
-        for (int i=0;i<dim;i++){
+        for (int i = 0; i < dim; i++) {
             shapeView[i] = shape[permutation[i]];
         }
         return shapeView;
     }
 
-    Map<int[], Integer> pointerMapping(){
+    Map<int[], Integer> pointerMapping() {
         List<List<Integer>> list = Lists.newArrayList();
         int[] shapeView = getShape();
-        for(int i=0;i<dim;i++){
+        for (int i = 0; i < dim; i++) {
             list.add(
                     IntStream.range(0, shapeView[i])
                             .boxed()
@@ -186,19 +195,20 @@ public class NdIndexer {
         return stride;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NdIndexer ndIndexer = (NdIndexer) o;
+        NdIndexer indexer = (NdIndexer) o;
 
-        if (dim != ndIndexer.dim) return false;
-        if (size != ndIndexer.size) return false;
-        if (!Arrays.equals(pointers, ndIndexer.pointers)) return false;
-        if (!Arrays.equals(shape, ndIndexer.shape)) return false;
-        return Arrays.equals(stride, ndIndexer.stride);
+        if (dim != indexer.dim) return false;
+        if (size != indexer.size) return false;
+        if (!Arrays.equals(pointers, indexer.pointers)) return false;
+        if (!Arrays.equals(shape, indexer.shape)) return false;
+        if (!Arrays.equals(stride, indexer.stride)) return false;
+        if (!Arrays.equals(permutation, indexer.permutation)) return false;
+        return Arrays.equals(invPermutation, indexer.invPermutation);
     }
 
     @Override
@@ -208,6 +218,8 @@ public class NdIndexer {
         result = 31 * result + size;
         result = 31 * result + Arrays.hashCode(shape);
         result = 31 * result + Arrays.hashCode(stride);
+        result = 31 * result + Arrays.hashCode(permutation);
+        result = 31 * result + Arrays.hashCode(invPermutation);
         return result;
     }
 }

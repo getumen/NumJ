@@ -39,25 +39,25 @@ public class NdArrayImpl implements NdArray {
             int[] shape = shape();
             int[] otherShape = other.shape();
             List<List<Integer>> lists = Lists.newArrayList();
-            int[] newShape = new  int[dim()];
+            int[] newShape = new int[dim()];
             for (int i = 0; i < dim(); i++) {
                 List<Integer> list = IntStream
                         .range(0, shape[i] > otherShape[i] ? shape[i] : otherShape[i])
                         .boxed()
                         .collect(Collectors.toList());
                 lists.add(list);
-                newShape[i]=list.size();
+                newShape[i] = list.size();
             }
             NdArray array = new NdArrayImpl(
                     newShape,
                     new AtomicDoubleArray(
-                            Arrays.stream(newShape).reduce((l,r)->l*r).orElseThrow(RuntimeException::new))
+                            Arrays.stream(newShape).reduce((l, r) -> l * r).orElseThrow(RuntimeException::new))
             );
             Lists.cartesianProduct(lists).stream()
                     .parallel()
                     .map(Ints::toArray)
                     .forEach(
-                            coordinate->
+                            coordinate ->
                                     array.put(
                                             coordinate,
                                             op.apply(
@@ -67,8 +67,8 @@ public class NdArrayImpl implements NdArray {
                                     )
                     );
             return array;
-        }else {
-            NdArray array = new  NdArrayImpl(shape(), new AtomicDoubleArray(size()));
+        } else {
+            NdArray array = new NdArrayImpl(shape(), new AtomicDoubleArray(size()));
             IntStream
                     .range(0, size())
                     .parallel()
@@ -229,8 +229,9 @@ public class NdArrayImpl implements NdArray {
 
         NdArrayImpl ndArray = (NdArrayImpl) o;
 
-        if (!data.toString().equals(ndArray.data.toString())) return false;
-        return iterator.equals(ndArray.iterator);
+        return this.toString().equals(ndArray.toString());
+        //if (!data.toString().equals(ndArray.data.toString())) return false;
+        //return iterator.equals(ndArray.iterator);
     }
 
     @Override

@@ -8,7 +8,7 @@ public class NdArrayImplTest {
 
     @Test
     public void size() throws Exception {
-        assertEquals(3*4*5, NumJ.ones(3,4,5).size());
+        assertEquals(3 * 4 * 5, NumJ.ones(3, 4, 5).size());
     }
 
     @Test
@@ -25,6 +25,15 @@ public class NdArrayImplTest {
 
     @Test
     public void add() throws Exception {
+        NdArray ones = NumJ.ones(3, 4);
+        assertEquals(
+                new NdArrayImpl(new int[]{3, 4}, new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}),
+                ones.add(NumJ.arange(4, 1, 4))
+        );
+        assertEquals(
+                new NdArrayImpl(new int[]{3, 4}, new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}),
+                ones.add(NumJ.arange(4, 4, 1).transpose())
+        );
     }
 
     @Test
