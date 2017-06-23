@@ -8,6 +8,40 @@ import java.util.stream.IntStream;
 import static org.junit.Assert.*;
 
 public class NdIndexerTest {
+
+    @Test
+    public void composite() throws Exception{
+        NdIndexer indexer =new NdIndexer(new int[]{10, 20, 30, 40});
+        NdIndexer transposed = indexer.transpose(2,0,3,1);
+        assertEquals(
+                indexer.pointer(new int[]{9, 19, 19, 20 }),
+                transposed.pointer(new int[]{19, 9, 20, 19})
+        );
+        NdIndexer sliced = transposed.slice(new NdIndex[]{
+                new NdIndexInterval(10, 20),
+                new NdIndexAll(),
+                new NdIndexSet(2,4,6,8,10,12,14,16,18,20),
+                new NdIndexAll()
+        });
+        assertEquals(
+                indexer.pointer(new int[]{9, 19, 19, 20 }),
+                sliced.pointer(new int[]{9, 9, 9, 19})
+        );
+        assertArrayEquals(new int[]{10,10,10,20}, sliced.getShape());
+        NdIndexer reshaped = sliced.reshape(20000,1,1,1);
+        assertEquals(
+                indexer.pointer(new int[]{9, 19, 19, 20 }),
+                reshaped.pointer(new int[]{19999,0,0,0})
+        );
+        NdIndexer tmp = reshaped.reshape(10,10,10,20).transpose(1,3,0,2);
+        assertArrayEquals(new int[]{0,1,2,3}, tmp.getPermutation());
+        assertEquals(
+                indexer.pointer(new int[]{0,0,10,2}),
+                tmp.pointer(new int[]{0,0,0,0})
+        );
+
+    }
+
     @Test
     public void pointer() throws Exception {
         NdIndexer indexer = new NdIndexer(new int[]{3,4,5});
@@ -98,6 +132,57 @@ public class NdIndexerTest {
                                 sliceSet.pointer(new int[]{1,2,3})
                         )
                 )
+        );
+
+        NdIndexer sliceSetSet = sliceSet.slice(
+                new NdIndex[]{
+                        new NdIndexAll(),
+                        new NdIndexInterval(1,2),
+                        new NdIndexSet(2,3)
+                }
+        );
+        assertEquals(
+                indexer.pointer(new int[]{3,3,4}),
+                sliceSetSet.pointer(new int[]{1,0,0})
+        );
+    }
+
+    @Test
+    public void transpose() throws Exception{
+        NdIndexer indexer = new NdIndexer(new int[]{5,6,7});
+        NdIndexer transposed = indexer.transpose(2,0,1);
+        assertArrayEquals(new int[]{7,5,6}, transposed.getShape());
+        assertEquals(
+                indexer.pointer(new int[]{3,4,5}),
+                transposed.pointer(new int[]{5,3,4})
+        );
+        assertEquals(
+                indexer.pointer(new int[]{3,4,5}),
+                indexer
+                        .transpose(1,2,0)
+                        .transpose(1,2,0)
+                        .transpose(1,2,0)
+                        .pointer(new int[]{3,4,5})
+
+        );
+    }
+
+    @Test
+    public void reshape() throws Exception{
+        NdIndexer indexer = new NdIndexer(new int[]{5,6,7});
+        assertArrayEquals(new int[]{70, 3, 1}, indexer.reshape(70,3,1).getShape());
+        assertArrayEquals(new int[]{5, 6, 7}, indexer.getShape());
+        NdIndexer reshaped = indexer.reshape(7,10,3);
+        assertEquals(indexer.pointer(new int[]{0,0,0}), reshaped.pointer(new int[]{0,0,0}));
+        assertEquals(indexer.pointer(new int[]{4,5,6}), reshaped.pointer(new int[]{6,9,2}));
+        assertEquals(
+                indexer.pointer(new int[]{4,5,6}),
+                indexer
+                        .reshape(210, 1, 1)
+                        .reshape(15, 2, 7)
+                        .reshape(5,6,7)
+                        .pointer(new int[]{4,5,6})
+
         );
     }
 
