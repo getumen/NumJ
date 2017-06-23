@@ -2,9 +2,10 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;

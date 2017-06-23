@@ -1,10 +1,8 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Factory method for NdIndex
@@ -12,19 +10,19 @@ import java.util.Iterator;
 
 public class NdSlice {
 
-    public static NdIndex all(){
+    public static NdIndex all() {
         return new NdIndexAll();
     }
 
-    public static NdIndex interval(int start, int end){
+    public static NdIndex interval(int start, int end) {
         return new NdIndexInterval(start, end);
     }
 
-    public static NdIndex set(int... set){
+    public static NdIndex set(int... set) {
         return new NdIndexSet(set);
     }
 
-    public static NdIndex set(Collection<Integer> set){
+    public static NdIndex set(Collection<Integer> set) {
         return new NdIndexSet(Ints.toArray(set));
     }
 }

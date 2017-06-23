@@ -225,7 +225,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public void conditionalPut(Predicate<Double> f, double value) {
-        Arrays.stream(iterator.getPointers()).filter(p->f.test(data.get(p))).forEach(p->data.set(p, value));
+        Arrays.stream(iterator.getPointers()).filter(p -> f.test(data.get(p))).forEach(p -> data.set(p, value));
     }
 
     @Override
