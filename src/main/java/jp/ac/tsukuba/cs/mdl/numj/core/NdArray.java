@@ -44,6 +44,8 @@ public interface NdArray {
 
     NdArray transpose();
 
+    NdArray transpose(int... dim);
+
     NdArray reshape(int... rearrange);
 
     @Override

@@ -15,7 +15,7 @@ public class NdIndexInterval implements NdIndex {
 
     @Override
     public Optional<Integer> map(Integer i) {
-        if (i < end - start) {
+        if (start <= i && i < end) {
             return Optional.of(i);
         }
         return Optional.empty();

@@ -20,7 +20,7 @@ public class NdIndexer {
     private int[] stride;
 
     public static int computeSize(int[] shape) {
-        return Arrays.stream(shape).sum();
+        return Arrays.stream(shape).reduce((l,r)->l*r).orElse(0);
     }
 
     public NdIndexer(int[] shape) {
@@ -54,13 +54,17 @@ public class NdIndexer {
         int[] stride = new int[shape.length];
         stride[shape.length - 1] = 1;
         for (int i = shape.length - 2; i >= 0; i--) {
-            stride[i] = stride[i + 1] * shape[i];
+            stride[i] = stride[i + 1] * shape[i+1];
         }
         return stride;
     }
 
     public int pointer(int[] coordinate) {
-        return IntStream.range(0, dim).map(i -> pointers[coordinate[i] * stride[i]]).sum();
+        return pointers[IntStream.range(0, dim).map(i -> coordinate[i] * stride[i]).sum()];
+    }
+
+    public int pointerIndex(int pointer){
+        return Arrays.binarySearch(pointers, pointer);
     }
 
     public int[] coordinate(int index) {
@@ -104,33 +108,21 @@ public class NdIndexer {
         return dim;
     }
 
-    public void setDim(int dim) {
-        this.dim = dim;
-    }
 
     public int getSize() {
         return size;
     }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
 
     public int[] getShape() {
         return shape;
     }
 
-    public void setShape(int[] shape) {
-        this.shape = shape;
-    }
 
     public int[] getStride() {
         return stride;
     }
 
-    public void setStride(int[] stride) {
-        this.stride = stride;
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -197,11 +197,16 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray slice(NdIndex[] indices) {
-        return null;
+        return new NdArrayImpl(iterator.slice(indices), data);
     }
 
     @Override
     public NdArray transpose() {
+        return null;
+    }
+
+    @Override
+    public NdArray transpose(int... dim) {
         return null;
     }
 
