@@ -96,6 +96,15 @@ public class NdIndexer {
                 ];
     }
 
+    public int broadcastPointer(int[] coordinate) {
+        return pointers[
+                IntStream
+                        .range(0, dim)
+                        .map(i -> coordinate[i%shape[permutation[i]]] * stride[permutation[i]])
+                        .sum()
+                ];
+    }
+
     public int pointerIndex(int pointer){
         return Arrays.binarySearch(pointers, pointer);
     }

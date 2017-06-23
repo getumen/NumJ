@@ -14,7 +14,7 @@ public interface NdArray {
 
     NdArray copy();
 
-    boolean checkDemensions(NdArray other);
+    boolean checkBroadcast(NdArray other);
 
     NdArray add(NdArray other);
 
@@ -34,7 +34,9 @@ public interface NdArray {
 
     NdArray get(NdIndex... indexes);
 
-    double get(int[] cords);
+    double get(int[] coordinate);
+
+    double braodcastGet(int[] coordinate);
 
     void put(int[] indexes, double value);
 
