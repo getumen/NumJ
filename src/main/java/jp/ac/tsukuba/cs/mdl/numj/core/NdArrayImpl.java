@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -223,6 +224,11 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
+    public void conditionalPut(Predicate<Double> f, double value) {
+        Arrays.stream(iterator.getPointers()).filter(p->f.test(data.get(p))).forEach(p->data.set(p, value));
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -230,8 +236,6 @@ public class NdArrayImpl implements NdArray {
         NdArrayImpl ndArray = (NdArrayImpl) o;
 
         return this.toString().equals(ndArray.toString());
-        //if (!data.toString().equals(ndArray.data.toString())) return false;
-        //return iterator.equals(ndArray.iterator);
     }
 
     @Override

@@ -1,6 +1,10 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import java.util.Arrays;
+import java.util.function.Function;
+import java.util.function.IntToDoubleFunction;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 public class NumJ {
 
@@ -26,12 +30,17 @@ public class NumJ {
         return createByNumber(0, shape);
     }
 
+    public static NdArray generator(IntToDoubleFunction f, int... shape){
+        int size = Arrays.stream(shape).reduce((l,r)->l*r).orElseThrow(IllegalArgumentException::new);
+        return new NdArrayImpl(shape, IntStream.range(0,size).mapToDouble(f).toArray());
+    }
+
+    public static NdArray generator(Supplier<Double> f, int... shape){
+        int size = Arrays.stream(shape).reduce((l,r)->l*r).orElseThrow(IllegalArgumentException::new);
+        return new NdArrayImpl(shape, IntStream.range(0,size).mapToDouble(i -> f.get()).toArray());
+    }
+
     public static NdArray arange(int num, int... shape) {
-        int size = size(shape);
-        double[] array = new double[size];
-        for (int i = 0; i < size; i++) {
-            array[i] = i;
-        }
-        return new NdArrayImpl(shape, array);
+        return generator(i->i, shape);
     }
 }

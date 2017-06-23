@@ -2,6 +2,8 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import com.google.common.util.concurrent.AtomicDoubleArray;
 
+import java.util.function.Predicate;
+
 public interface NdArray {
 
     AtomicDoubleArray data();
@@ -55,4 +57,6 @@ public interface NdArray {
 
     @Override
     int hashCode();
+
+    void conditionalPut(Predicate<Double> f, double value);
 }
