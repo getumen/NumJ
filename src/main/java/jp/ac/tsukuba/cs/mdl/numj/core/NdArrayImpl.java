@@ -3,6 +3,7 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AtomicDoubleArray;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,11 @@ public class NdArrayImpl implements NdArray {
     protected AtomicDoubleArray data;
 
     protected NdIndexer iterator;
+
+    public NdArrayImpl(int[] shape) {
+        this.iterator = new NdIndexer(shape);
+        this.data = new AtomicDoubleArray(iterator.getSize());
+    }
 
     public NdArrayImpl(int[] shape, AtomicDoubleArray data) {
         this.data = data;
@@ -121,20 +127,17 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
-    public NdArray axiswise(Function<int[], Double> op, int... axis) {
-        List<List<Integer>> lists = Lists.newArrayList();
-        int[] shape = shape();
-        for (int i=0;i<dim();i++){
-            if (Ints.contains(axis, i)){
-                continue;
-            }
-            List<Integer> list = IntStream
-                    .range(0, shape[i])
-                    .boxed()
-                    .collect(Collectors.toList());
-            lists.add(list);
-        }
-        return null;
+    public NdArray elementwisei(Function<int[], Double> op) {
+        Arrays.stream(iterator.allCoordinate())
+                .parallel()
+                .forEach(
+                        coordinate ->
+                                data.lazySet(
+                                        iterator.pointer(coordinate),
+                                        op.apply(coordinate)
+                                )
+                );
+        return this;
     }
 
     @Override
@@ -165,26 +168,70 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray dot(NdArray other) {
-        NdArray result;
+
         int[] shape = shape();
         int[] otherShape = other.shape();
-        if (other.dim() == 1){
-            if (shape[0]==other.size()){
-                int[] subShape = Arrays.copyOfRange(shape,0, dim()-1);
-                result = new NdArrayImpl(
-                        subShape ,
-                        new double[Arrays.stream(subShape).reduce((l,r)->l*r).orElseThrow(RuntimeException::new)]
-                );
-
-                for (int i=0;i<other.size();i++){
-                    int[] idx = new int[]{i};
-                    result.put(idx, get(idx)*other.get(idx));
-                }
-                return result;
+        if (other.dim() == 1) {
+            NdArray result = new NdArrayImpl(Arrays.copyOfRange(shape, 0, shape.length - 1));
+            result.elementwisei(coordinate -> IntStream.range(0, shape[shape.length - 1])
+                    .mapToDouble(
+                            i ->
+                                    data.get(iterator.pointer(Ints.concat(coordinate, new int[]{i})))
+                                            * other.get(new int[]{i})).sum()
+            );
+            return result;
+        } else {
+            int[] newShape = new int[shape.length + otherShape.length - 2];
+            for (int i = 0; i < shape.length - 1; i++) {
+                newShape[i] = shape[i];
             }
+            for (int i = 0; i < otherShape.length - 2; i++) {
+                newShape[i + shape.length - 1] = otherShape[i];
+            }
+            newShape[newShape.length - 1] = otherShape[otherShape.length - 1];
+            NdArray result = new NdArrayImpl(newShape);
+            result.elementwisei(coordinate -> {
+                int[] first = Arrays.copyOfRange(coordinate, 0, shape.length - 1);
+                double ret = 0;
+                for (int i = 0; i < shape[shape.length - 1]; i++) {
+                    List<Integer> last = Lists.newArrayList();
+                    last.addAll(Ints.asList(coordinate).subList(shape.length - 1, newShape.length));
+                    last.add(last.size() - 1, i);
+                    ret += data.get(iterator.pointer(Ints.concat(first, new int[]{i}))) * other.get(Ints.toArray(last));
+                }
+                return ret;
+            });
+            return result;
         }
+    }
 
+    @Override
+    public int argmax() {
+        return Arrays.stream(iterator.getPointers())
+                .parallel()
+                .mapToObj(i -> Pair.of(i, data.get(i)))
+                .reduce((l, r) -> l.getRight() > r.getRight() ? l : r)
+                .map(Pair::getLeft)
+                .map(iterator::pointerIndex)
+                .orElseThrow(RuntimeException::new);
+    }
 
+    @Override
+    public NdArray argmax(int... axis) {
+        return null;
+    }
+
+    @Override
+    public double max() {
+        return Arrays.stream(iterator.getPointers())
+                .parallel()
+                .mapToDouble(data::get)
+                .reduce((l, r) -> l > r ? l : r)
+                .orElseThrow(RuntimeException::new);
+    }
+
+    @Override
+    public NdArray max(int... axis) {
         return null;
     }
 
@@ -359,7 +406,18 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public String toString() {
-        return stringfyMatrix(new StringBuffer(), 0, new int[0]).toString();
+        if (dim()>1){
+            return stringfyMatrix(new StringBuffer(), 0, new int[0]).toString();
+        }else {
+            StringBuffer sb = new StringBuffer();
+            sb.append("[ ");
+            for (int i=0;i<data.length();i++){
+                sb.append(data.get(i));
+                sb.append(", ");
+            }
+            sb.append("]");
+            return sb.toString();
+        }
     }
 
 }

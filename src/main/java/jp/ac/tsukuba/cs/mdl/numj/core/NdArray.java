@@ -26,7 +26,7 @@ public interface NdArray {
 
     NdArray elementwise(Function<Double, Double> op);
 
-    NdArray axiswise(Function<int[], Double> op, int... axis);
+    NdArray elementwisei(Function<int[], Double> op);
 
     NdArray dot(NdArray other);
 
@@ -45,6 +45,14 @@ public interface NdArray {
     NdArray div(NdArray other);
 
     NdArray div(Number other);
+
+    int argmax();
+
+    NdArray argmax(int... axis);
+
+    double max();
+
+    NdArray max(int... axis);
 
     NdArray get(NdIndex... indexes);
 
