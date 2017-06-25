@@ -21,6 +21,6 @@ public class NumJTest {
 
     @Test
     public void arange(){
-        assertEquals(NumJ.create(new double[]{0,1,2,3},2,2), NumJ.arange(4, 2,2));
+        assertEquals(NumJ.create(new double[]{0,1,2,3},2,2), NumJ.arange(2,2));
     }
 }

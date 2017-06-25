@@ -39,7 +39,7 @@ public class NumJ {
         return new NdArrayImpl(shape, IntStream.range(0, size).mapToDouble(i -> f.get()).toArray());
     }
 
-    public static NdArray arange(int num, int... shape) {
+    public static NdArray arange(int... shape) {
         return generator(i -> i, shape);
     }
 }

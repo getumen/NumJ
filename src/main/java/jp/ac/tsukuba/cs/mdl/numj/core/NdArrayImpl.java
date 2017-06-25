@@ -195,7 +195,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray add(Number other) {
-        return elementwise(other, (l, r) -> l * r);
+        return elementwise(other, (l, r) -> l + r);
     }
 
     @Override

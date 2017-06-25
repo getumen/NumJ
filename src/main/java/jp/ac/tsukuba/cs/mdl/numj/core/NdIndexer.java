@@ -66,6 +66,10 @@ public class NdIndexer {
         return new NdIndexer(newShape, newPointers);
     }
 
+    public int[][] allCoordinate(){
+        return allCoordinate(shape);
+    }
+
     public static int[][] allCoordinate(int... shape){
         List<List<Integer>> lists = Lists.newArrayList();
         for (int i=0;i<shape.length;i++){

@@ -28,24 +28,27 @@ public class NdArrayImplTest {
         NdArray ones = NumJ.ones(3, 4);
         assertEquals(
                 new NdArrayImpl(new int[]{3, 4}, new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}),
-                ones.add(NumJ.arange(4, 1, 4))
+                ones.add(NumJ.arange(1, 4))
         );
         assertEquals(
                 new NdArrayImpl(new int[]{3, 4}, new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}),
-                ones.add(NumJ.arange(4, 4, 1).transpose())
+                ones.add(NumJ.arange(4, 1).transpose())
         );
     }
 
     @Test
     public void add1() throws Exception {
+        assertEquals(new NdArrayImpl(new int[]{2,3}, new double[]{1,2,3,4,5,6}), NumJ.arange(2,3).add(1));
     }
 
     @Test
     public void sub() throws Exception {
+        assertEquals(new NdArrayImpl(new int[]{2,3}, new double[]{-1,0,1,2,3,4}), NumJ.arange(2,3).sub(NumJ.ones(2,3)));
     }
 
     @Test
     public void sub1() throws Exception {
+        assertEquals(new NdArrayImpl(new int[]{2,3}, new double[]{-1,0,1,2,3,4}), NumJ.arange(2,3).sub(1));
     }
 
     @Test
