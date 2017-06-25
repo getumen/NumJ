@@ -2,6 +2,8 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import com.google.common.util.concurrent.AtomicDoubleArray;
 
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface NdArray {
@@ -17,6 +19,16 @@ public interface NdArray {
     NdArray copy();
 
     boolean checkBroadcast(NdArray other);
+
+    NdArray elementwise(NdArray other, BinaryOperator<Double> op);
+
+    NdArray elementwise(Number other, BinaryOperator<Double> op);
+
+    NdArray elementwise(Function<Double, Double> op);
+
+    NdArray axiswise(Function<int[], Double> op, int... axis);
+
+    NdArray dot(NdArray other);
 
     NdArray add(NdArray other);
 

@@ -27,13 +27,12 @@ public class NdIndexerTest {
                 sliced.pointer(new int[]{9, 9, 9, 19})
         );
         assertArrayEquals(new int[]{10,10,10,20}, sliced.getShape());
-        NdIndexer reshaped = sliced.reshape(20000,1,1,1);
+        NdIndexer reshaped = sliced.reshape(20000);
         assertEquals(
                 indexer.pointer(new int[]{9, 19, 19, 20 }),
                 reshaped.pointer(new int[]{19999,0,0,0})
         );
         NdIndexer tmp = reshaped.reshape(10,10,10,20).transpose(1,3,0,2);
-        assertArrayEquals(new int[]{0,1,2,3}, tmp.getPermutation());
         assertEquals(
                 indexer.pointer(new int[]{0,0,10,2}),
                 tmp.pointer(new int[]{0,0,0,0})

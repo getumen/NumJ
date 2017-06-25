@@ -32,6 +32,7 @@ public class NdArrayImpl implements NdArray {
         this.iterator = iterator;
     }
 
+    @Override
     public NdArray elementwise(NdArray other, BinaryOperator<Double> op) {
 
         boolean broadcast = this.checkBroadcast(other);
@@ -85,6 +86,7 @@ public class NdArrayImpl implements NdArray {
         }
     }
 
+    @Override
     public NdArray elementwise(Number value, BinaryOperator<Double> op) {
         NdArray array = new NdArrayImpl(shape(), new AtomicDoubleArray(size()));
         IntStream
@@ -103,6 +105,7 @@ public class NdArrayImpl implements NdArray {
         return array;
     }
 
+    @Override
     public NdArray elementwise(Function<Double, Double> op) {
         NdArray array = new NdArrayImpl(shape(), new double[size()]);
         IntStream.range(0, size())
@@ -115,6 +118,23 @@ public class NdArrayImpl implements NdArray {
                         )
                 );
         return array;
+    }
+
+    @Override
+    public NdArray axiswise(Function<int[], Double> op, int... axis) {
+        List<List<Integer>> lists = Lists.newArrayList();
+        int[] shape = shape();
+        for (int i=0;i<dim();i++){
+            if (Ints.contains(axis, i)){
+                continue;
+            }
+            List<Integer> list = IntStream
+                    .range(0, shape[i])
+                    .boxed()
+                    .collect(Collectors.toList());
+            lists.add(list);
+        }
+        return null;
     }
 
     @Override
@@ -141,6 +161,31 @@ public class NdArrayImpl implements NdArray {
                         .parallel()
                         .mapToDouble(i -> data.get(i))
                         .toArray());
+    }
+
+    @Override
+    public NdArray dot(NdArray other) {
+        NdArray result;
+        int[] shape = shape();
+        int[] otherShape = other.shape();
+        if (other.dim() == 1){
+            if (shape[0]==other.size()){
+                int[] subShape = Arrays.copyOfRange(shape,0, dim()-1);
+                result = new NdArrayImpl(
+                        subShape ,
+                        new double[Arrays.stream(subShape).reduce((l,r)->l*r).orElseThrow(RuntimeException::new)]
+                );
+
+                for (int i=0;i<other.size();i++){
+                    int[] idx = new int[]{i};
+                    result.put(idx, get(idx)*other.get(idx));
+                }
+                return result;
+            }
+        }
+
+
+        return null;
     }
 
     @Override
