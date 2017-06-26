@@ -1,4 +1,4 @@
-# NumJ: Pure Java N-dimensional Array 
+# NumJ:  Java N-dimensional Array 
 
 ## Version
 *0.0.2*
