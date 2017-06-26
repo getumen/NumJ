@@ -1,4 +1,4 @@
-NumJ: simple N-dimensional Array for Java
+NumJ: simple N-dimensional Array for Java 
 -----------------------------
 
 # State

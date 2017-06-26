@@ -1,6 +1,7 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import com.google.common.util.concurrent.AtomicDoubleArray;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -46,11 +47,19 @@ public interface NdArray {
 
     NdArray div(Number other);
 
-    int argmax();
+    Double axisOperation(BinaryOperator<Double> op);
 
-    NdArray argmax(int... axis);
+    NdArray axisOperation(BinaryOperator<Double> op, int... axis);
 
-    double max();
+    Integer axisArgOperation(BinaryOperator<Pair<Integer, Double>> op);
+
+    NdArray axisArgOperation(BinaryOperator<Pair<Integer, Double>> op, int axis);
+
+    Integer argmax();
+
+    NdArray argmax(int axis);
+
+    Double max();
 
     NdArray max(int... axis);
 

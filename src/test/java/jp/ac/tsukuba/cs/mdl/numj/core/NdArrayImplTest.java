@@ -19,6 +19,8 @@ public class NdArrayImplTest {
 
     @Test
     public void argmax() throws Exception {
+        assertEquals(Integer.valueOf(5), NumJ.arange(3,2).argmax());
+        assertEquals(NumJ.ones(3), NumJ.arange(3,2).argmax(1));
     }
 
     @Test

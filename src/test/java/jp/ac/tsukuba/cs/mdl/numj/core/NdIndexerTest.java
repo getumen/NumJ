@@ -2,6 +2,7 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
@@ -131,6 +132,16 @@ public class NdIndexerTest {
                         )
                 )
         );
+
+        /*
+        point
+         */
+        NdIndexer point = indexer.slice(new NdIndex[]{
+                new NdIndexPoint(3),
+                new NdIndexPoint(4),
+                new NdIndexPoint(5),
+        });
+        assertEquals(1, point.getSize());
 
         NdIndexer sliceSetSet = sliceSet.slice(
                 new NdIndex[]{

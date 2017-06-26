@@ -141,6 +141,85 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
+    public Double axisOperation(BinaryOperator<Double> op) {
+        return Arrays.stream(iterator.getPointers())
+                .mapToDouble(i -> data.get(i))
+                .reduce(op::apply)
+                .orElseThrow(RuntimeException::new);
+    }
+
+    @Override
+    public Integer axisArgOperation(BinaryOperator<Pair<Integer, Double>> op) {
+        return Arrays.stream(iterator.getPointers())
+                .mapToObj(i -> Pair.of(iterator.pointerIndex(i), data.get(i)))
+                .reduce(op)
+                .map(Pair::getLeft)
+                .orElseThrow(RuntimeException::new);
+    }
+
+    @Override
+    public NdArray axisOperation(BinaryOperator<Double> op, int... axis) {
+        int[] newShape;
+        int[] shape = shape();
+        int dim = dim();
+        if (axis == null || axis.length == dim) {
+            newShape = new int[]{1};
+            return new NdArrayImpl(newShape, new double[]{axisOperation(op)});
+        } else {
+            newShape = new int[dim - axis.length];
+            int p = 0;
+            for (int i = 0; i < dim(); i++) {
+                if (!Ints.contains(axis, i)) {
+                    newShape[p++] = shape[i];
+                }
+            }
+            NdArray result = new NdArrayImpl(newShape);
+            result.elementwisei(coordinate -> {
+                NdIndex[] indices = new NdIndex[dim];
+                for (int i = 0; i < dim; i++) {
+                    if (Ints.contains(axis, i)) {
+                        indices[i] = new NdIndexAll();
+                    } else {
+                        indices[i] = new NdIndexPoint(shape[i]);
+                    }
+                }
+                return this.slice(indices).axisOperation(op);
+            });
+            return result;
+        }
+    }
+
+    @Override
+    public NdArray axisArgOperation(BinaryOperator<Pair<Integer, Double>> op, int axis) {
+        int[] newShape;
+        int[] shape = shape();
+        int dim = dim();
+
+        newShape = new int[dim - 1];
+        int p = 0;
+        for (int i = 0; i < dim(); i++) {
+            if (! (axis == i)) {
+                newShape[p++] = shape[i];
+            }
+        }
+        NdArray result = new NdArrayImpl(newShape);
+        result.elementwisei(coordinate -> {
+            NdIndex[] indices = new NdIndex[dim];
+            for (int i = 0; i < dim; i++) {
+                if (axis == i) {
+                    indices[i] = new NdIndexAll();
+                } else {
+                    indices[i] = new NdIndexPoint(coordinate[i]);
+                }
+            }
+
+            return Double.valueOf(this.slice(indices).axisArgOperation(op));
+        });
+        return result;
+
+    }
+
+    @Override
     public int size() {
         return iterator.getSize();
     }
@@ -172,6 +251,9 @@ public class NdArrayImpl implements NdArray {
         int[] shape = shape();
         int[] otherShape = other.shape();
         if (other.dim() == 1) {
+            if (shape[shape.length - 1] != other.size()) {
+                throw new NdArrayException(this, other);
+            }
             NdArray result = new NdArrayImpl(Arrays.copyOfRange(shape, 0, shape.length - 1));
             result.elementwisei(coordinate -> IntStream.range(0, shape[shape.length - 1])
                     .mapToDouble(
@@ -181,6 +263,9 @@ public class NdArrayImpl implements NdArray {
             );
             return result;
         } else {
+            if (shape[shape.length - 1] != otherShape[otherShape.length - 2]) {
+                throw new NdArrayException(this, other);
+            }
             int[] newShape = new int[shape.length + otherShape.length - 2];
             for (int i = 0; i < shape.length - 1; i++) {
                 newShape[i] = shape[i];
@@ -206,33 +291,23 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
-    public int argmax() {
-        return Arrays.stream(iterator.getPointers())
-                .parallel()
-                .mapToObj(i -> Pair.of(i, data.get(i)))
-                .reduce((l, r) -> l.getRight() > r.getRight() ? l : r)
-                .map(Pair::getLeft)
-                .map(iterator::pointerIndex)
-                .orElseThrow(RuntimeException::new);
+    public Integer argmax() {
+        return this.axisArgOperation((l, r) -> l.getRight() > r.getRight() ? l : r);
     }
 
     @Override
-    public NdArray argmax(int... axis) {
-        return null;
+    public NdArray argmax(int axis) {
+        return this.axisArgOperation((l, r) -> l.getRight() > r.getRight() ? l : r, axis);
     }
 
     @Override
-    public double max() {
-        return Arrays.stream(iterator.getPointers())
-                .parallel()
-                .mapToDouble(data::get)
-                .reduce((l, r) -> l > r ? l : r)
-                .orElseThrow(RuntimeException::new);
+    public Double max() {
+        return this.axisOperation((l, r) -> l > r ? l : r);
     }
 
     @Override
     public NdArray max(int... axis) {
-        return null;
+        return this.axisOperation((l, r) -> l > r ? l : r, axis);
     }
 
     @Override
@@ -406,12 +481,12 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public String toString() {
-        if (dim()>1){
+        if (dim() > 1) {
             return stringfyMatrix(new StringBuffer(), 0, new int[0]).toString();
-        }else {
+        } else {
             StringBuffer sb = new StringBuffer();
             sb.append("[ ");
-            for (int i=0;i<data.length();i++){
+            for (int i = 0; i < data.length(); i++) {
                 sb.append(data.get(i));
                 sb.append(", ");
             }
