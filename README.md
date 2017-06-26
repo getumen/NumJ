@@ -1,10 +1,9 @@
-NumJ: simple N-dimensional Array for Java 
------------------------------
+# NumJ: Pure Java N-dimensional Array 
 
-# Version
+## Version
 *0.0.2*
 
-# Install
+## Installation
 
 - For gradle
 ```$gradle
