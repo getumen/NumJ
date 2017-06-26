@@ -71,11 +71,17 @@ public interface NdArray {
 
     double get(int[] coordinate);
 
+    NdArray where(Predicate<Double> op);
+
     double braodcastGet(int[] coordinate);
 
     void put(int[] indexes, double value);
 
     void put(NdIndex[] indexes, NdArray array);
+
+    void put(NdArray where, Number value);
+
+    void put(NdArray where, NdArray value);
 
     NdArray slice(NdIndex[] indices);
 

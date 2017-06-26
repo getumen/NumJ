@@ -406,6 +406,21 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
+    public NdArray where(Predicate<Double> op) {
+        return this.copy().elementwisei(coordinate -> op.test(data.get(iterator.pointer(coordinate))) ? 1. : 0.);
+    }
+
+    @Override
+    public void put(NdArray where, Number value) {
+        this.elementwisei(coordinate -> where.get(coordinate) > 0 ? value.doubleValue() : this.get(coordinate));
+    }
+
+    @Override
+    public void put(NdArray where, NdArray value) {
+        this.elementwisei(coordinate -> where.get(coordinate) > 0 ? value.get(coordinate) : this.get(coordinate));
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
