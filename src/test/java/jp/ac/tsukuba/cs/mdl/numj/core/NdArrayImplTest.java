@@ -10,17 +10,17 @@ public class NdArrayImplTest {
         NdArray arange1 = NumJ.arange(3, 4);
         NdArray arange2 = NumJ.arange(4, 2);
         assertArrayEquals(new int[]{3, 2}, arange1.dot(arange2).shape());
-        assertEquals(new NdArrayImpl(new int[]{3, 2}, new double[]{28, 34, 76, 98, 124, 162}), arange1.dot(arange2));
+        assertEquals(NumJ.create(new double[]{28, 34, 76, 98, 124, 162}, new int[]{3, 2}), arange1.dot(arange2));
         NdArray vec = NumJ.arange(4);
         assertEquals(1, arange1.dot(vec).dim());
         assertArrayEquals(new int[]{3}, arange1.dot(vec).shape());
-        assertEquals(new NdArrayImpl(new int[]{3}, new double[]{14, 38, 62}), arange1.dot(vec));
+        assertEquals(NumJ.create(new double[]{14, 38, 62}, new int[]{3}), arange1.dot(vec));
     }
 
     @Test
     public void argmax() throws Exception {
-        assertEquals(Integer.valueOf(5), NumJ.arange(3,2).argmax());
-        assertEquals(NumJ.ones(3), NumJ.arange(3,2).argmax(1));
+        assertEquals(Integer.valueOf(5), NumJ.arange(3, 2).argmax());
+        assertEquals(NumJ.ones(3), NumJ.arange(3, 2).argmax(1));
     }
 
     @Test
@@ -56,28 +56,28 @@ public class NdArrayImplTest {
     public void add() throws Exception {
         NdArray ones = NumJ.ones(3, 4);
         assertEquals(
-                new NdArrayImpl(new int[]{3, 4}, new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}),
+                NumJ.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 3, 4),
                 ones.add(NumJ.arange(1, 4))
         );
         assertEquals(
-                new NdArrayImpl(new int[]{3, 4}, new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}),
+                NumJ.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 3, 4),
                 ones.add(NumJ.arange(4, 1).transpose())
         );
     }
 
     @Test
     public void add1() throws Exception {
-        assertEquals(new NdArrayImpl(new int[]{2, 3}, new double[]{1, 2, 3, 4, 5, 6}), NumJ.arange(2, 3).add(1));
+        assertEquals(NumJ.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3), NumJ.arange(2, 3).add(1));
     }
 
     @Test
     public void sub() throws Exception {
-        assertEquals(new NdArrayImpl(new int[]{2, 3}, new double[]{-1, 0, 1, 2, 3, 4}), NumJ.arange(2, 3).sub(NumJ.ones(2, 3)));
+        assertEquals(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3), NumJ.arange(2, 3).sub(NumJ.ones(2, 3)));
     }
 
     @Test
     public void sub1() throws Exception {
-        assertEquals(new NdArrayImpl(new int[]{2, 3}, new double[]{-1, 0, 1, 2, 3, 4}), NumJ.arange(2, 3).sub(1));
+        assertEquals(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3), NumJ.arange(2, 3).sub(1));
     }
 
     @Test
