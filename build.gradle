@@ -9,8 +9,20 @@
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 
-// Apply the application plugin to add support for building an application
-apply plugin: 'application'
+def repo = new File(rootDir, "repository")
+
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository url: "file://${repo.absolutePath}"
+            pom.version = '0.0.1'
+            pom.groupId = 'jp.ac.tsukuba.cs.mdl.numj'
+            pom.artifactId = 'numj'
+        }
+    }
+}
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -24,7 +36,10 @@ dependencies {
     compile 'com.google.guava:guava:22.0'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
@@ -33,6 +48,3 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0'
 }
-
-// Define the main class for the application
-mainClassName = 'App'

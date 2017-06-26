@@ -1,6 +1,9 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
+
 import java.util.Arrays;
+import java.util.Random;
 import java.util.function.IntToDoubleFunction;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -41,5 +44,15 @@ public class NumJ {
 
     public static NdArray arange(int... shape) {
         return generator(i -> i, shape);
+    }
+
+    public static NdArray normal(double mu, double sigma, int... shape){
+        NormalDistribution normalDist = new NormalDistribution(mu, sigma*sigma);
+        return generator(()->normalDist.sample(), shape);
+    }
+
+    public static NdArray uniform(int... shape){
+        Random random = new Random();
+        return generator(()->random.nextDouble(), shape);
     }
 }

@@ -198,7 +198,7 @@ public class NdArrayImpl implements NdArray {
         newShape = new int[dim - 1];
         int p = 0;
         for (int i = 0; i < dim(); i++) {
-            if (! (axis == i)) {
+            if (!(axis == i)) {
                 newShape[p++] = shape[i];
             }
         }
@@ -308,6 +308,16 @@ public class NdArrayImpl implements NdArray {
     @Override
     public NdArray max(int... axis) {
         return this.axisOperation((l, r) -> l > r ? l : r, axis);
+    }
+
+    @Override
+    public Double sum() {
+        return this.axisOperation((l, r) -> l + r);
+    }
+
+    @Override
+    public NdArray sum(int... axis) {
+        return this.axisOperation((l, r) -> l + r, axis);
     }
 
     @Override

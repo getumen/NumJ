@@ -63,6 +63,10 @@ public interface NdArray {
 
     NdArray max(int... axis);
 
+    Double sum();
+
+    NdArray sum(int... axis);
+
     NdArray get(NdIndex... indexes);
 
     double get(int[] coordinate);
