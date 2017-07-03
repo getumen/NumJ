@@ -46,13 +46,31 @@ public class NumJ {
         return generator(i -> i, shape);
     }
 
-    public static NdArray normal(double mu, double sigma, int... shape){
-        NormalDistribution normalDist = new NormalDistribution(mu, sigma*sigma);
-        return generator(()->normalDist.sample(), shape);
+    public static NdArray eye(int n, int m, int k) {
+        NdArray result = NumJ.zeros(n, m);
+        if (-n <= k && k < n && -m <= k && k < m) {
+            for (int i = 0; i < Math.min(n, m) - Math.abs(k); i++) {
+                result.put(new int[]{(k + i + n) % n, (k + i + m) % m}, 1.);
+            }
+        }
+        return result;
     }
 
-    public static NdArray uniform(int... shape){
+    public static NdArray eye(int n, int k) {
+        return eye(n, n, k);
+    }
+
+    public static NdArray identity(int n) {
+        return eye(n, n, 0);
+    }
+
+    public static NdArray normal(double mu, double sigma, int... shape) {
+        NormalDistribution normalDist = new NormalDistribution(mu, sigma * sigma);
+        return generator(() -> normalDist.sample(), shape);
+    }
+
+    public static NdArray uniform(int... shape) {
         Random random = new Random();
-        return generator(()->random.nextDouble(), shape);
+        return generator(() -> random.nextDouble(), shape);
     }
 }

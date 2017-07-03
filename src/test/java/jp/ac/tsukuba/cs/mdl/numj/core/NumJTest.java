@@ -23,4 +23,9 @@ public class NumJTest {
     public void arange(){
         assertEquals(NumJ.create(new double[]{0,1,2,3},2,2), NumJ.arange(2,2));
     }
+
+    @Test
+    public void eye(){
+        System.out.println(NumJ.eye(3,4,1));
+    }
 }

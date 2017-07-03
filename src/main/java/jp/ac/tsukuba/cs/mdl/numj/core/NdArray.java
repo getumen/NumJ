@@ -59,9 +59,17 @@ public interface NdArray {
 
     NdArray argmax(int axis);
 
+    Integer argmin();
+
+    NdArray argmin(int axis);
+
     Double max();
 
     NdArray max(int... axis);
+
+    Double min();
+
+    NdArray min(int... axis);
 
     Double sum();
 

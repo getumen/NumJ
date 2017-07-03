@@ -25,4 +25,8 @@ public class NdSlice {
     public static NdIndex set(Collection<Integer> set) {
         return new NdIndexSet(Ints.toArray(set));
     }
+
+    public static NdIndex point(int i){
+        return new NdIndexPoint(i);
+    }
 }

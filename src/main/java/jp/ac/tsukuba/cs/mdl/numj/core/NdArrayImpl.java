@@ -300,6 +300,17 @@ public class NdArrayImpl implements NdArray {
         return this.axisArgOperation((l, r) -> l.getRight() > r.getRight() ? l : r, axis);
     }
 
+
+    @Override
+    public Integer argmin() {
+        return this.axisArgOperation((l,r)->l.getRight() < r.getRight() ? l : r);
+    }
+
+    @Override
+    public NdArray argmin(int axis) {
+        return this.axisArgOperation((l,r)->l.getRight() < r.getRight()?l:r, axis);
+    }
+
     @Override
     public Double max() {
         return this.axisOperation((l, r) -> l > r ? l : r);
@@ -308,6 +319,16 @@ public class NdArrayImpl implements NdArray {
     @Override
     public NdArray max(int... axis) {
         return this.axisOperation((l, r) -> l > r ? l : r, axis);
+    }
+
+    @Override
+    public Double min() {
+        return this.axisOperation((l,r)->l<r?l:r);
+    }
+
+    @Override
+    public NdArray min(int... axis) {
+        return this.axisOperation((l,r)->l<r?l:r, axis);
     }
 
     @Override

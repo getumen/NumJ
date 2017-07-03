@@ -18,21 +18,19 @@ public class NdArrayImplTest {
     }
 
     @Test
+    public void dotN3(){
+        // O(N^3) if in 2 seconds
+        assertArrayEquals(new int[]{100,100},NumJ.arange(100,100).dot(NumJ.arange(100,100)).shape());
+    }
+
+    @Test
     public void argmax() throws Exception {
         assertEquals(Integer.valueOf(5), NumJ.arange(3, 2).argmax());
         assertEquals(NumJ.ones(3), NumJ.arange(3, 2).argmax(1));
     }
 
     @Test
-    public void argmax1() throws Exception {
-    }
-
-    @Test
     public void max() throws Exception {
-    }
-
-    @Test
-    public void max1() throws Exception {
     }
 
     @Test
@@ -63,6 +61,11 @@ public class NdArrayImplTest {
                 NumJ.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 3, 4),
                 ones.add(NumJ.arange(4, 1).transpose())
         );
+    }
+
+    @Test
+    public void addN() throws Exception {
+        assertArrayEquals(new int[]{1000, 1000}, NumJ.arange(1000,1000).add(NumJ.arange(1000,1000)).shape());
     }
 
     @Test
@@ -122,6 +125,13 @@ public class NdArrayImplTest {
 
     @Test
     public void put() throws Exception {
+        NdArray zero = NumJ.zeros(3,4);
+        for(int i=0;i<3;i++){
+            for(int j=0;j<4;j++){
+                zero.put(new int[]{i,j}, 1);
+            }
+        }
+        assertEquals(NumJ.ones(3,4), zero);
     }
 
     @Test
