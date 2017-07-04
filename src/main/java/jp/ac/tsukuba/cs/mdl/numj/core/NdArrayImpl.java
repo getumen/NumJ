@@ -534,7 +534,7 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
-    public NdArray slice(NdIndex[] indices) {
+    public NdArray slice(NdIndex... indices) {
         return new NdArrayImpl(iterator.slice(indices), data);
     }
 

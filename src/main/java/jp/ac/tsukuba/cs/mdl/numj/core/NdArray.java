@@ -111,7 +111,7 @@ public interface NdArray {
 
     void put(NdArray where, NdArray value);
 
-    NdArray slice(NdIndex[] indices);
+    NdArray slice(NdIndex... indices);
 
     NdArray transpose();
 
