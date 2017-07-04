@@ -364,11 +364,11 @@ public class NdArrayImpl implements NdArray {
     @Override
     public boolean checkBroadcast(NdArray other) {
         boolean broadcast = false;
+        int[] shape = shape(), otherShape = other.shape();
         for (int i = 0; i < dim(); i++) {
-            int[] shape = shape(), otherShape = other.shape();
-            if (shape[i] == otherShape[i]) {
+            if (shape.length == otherShape.length && shape[i] == otherShape[i]) {
                 continue;
-            } else if (shape[i] == 1 || otherShape[i] == 1) {
+            } else if (shape.length == otherShape.length && shape[i] == 1 || otherShape[i] == 1) {
                 broadcast = true;
             } else throw new NdArrayException(this, other);
         }
@@ -415,52 +415,52 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray eq(NdArray other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)==0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) == 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray eq(Number other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)==0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) == 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray gt(NdArray other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)>0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) > 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray gt(Number other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)>0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) > 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray lt(NdArray other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)<0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) < 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray lt(Number other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)<0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) < 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray gte(NdArray other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)>=0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) >= 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray gte(Number other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)>=0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) >= 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray lte(NdArray other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)<=0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) <= 0 ? 1. : 0.);
     }
 
     @Override
     public NdArray lte(Number other) {
-        return elementwise(other, (l, r) -> l.compareTo(r)<=0 ? 1. : 0.);
+        return elementwise(other, (l, r) -> l.compareTo(r) <= 0 ? 1. : 0.);
     }
 
     @Override
