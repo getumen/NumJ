@@ -56,74 +56,76 @@ public class NdArrayImpl implements NdArray {
                 lists.add(list);
                 newShape[i] = list.size();
             }
-            NdArray array = new NdArrayImpl(
-                    newShape,
-                    new AtomicDoubleArray(
-                            Arrays.stream(newShape).reduce((l, r) -> l * r).orElseThrow(RuntimeException::new))
-            );
+            NdIndexer indexer = new NdIndexer(newShape);
+            AtomicDoubleArray data = new AtomicDoubleArray(
+                    Arrays.stream(newShape).reduce((l, r) -> l * r).orElseThrow(RuntimeException::new));
+
             Lists.cartesianProduct(lists).stream()
                     .parallel()
                     .map(Ints::toArray)
                     .forEach(
                             coordinate ->
-                                    array.put(
-                                            coordinate,
+                                    data.lazySet(
+                                            indexer.pointer(coordinate),
                                             op.apply(
                                                     this.braodcastGet(coordinate),
                                                     other.braodcastGet(coordinate)
                                             )
                                     )
                     );
-            return array;
+            return new NdArrayImpl(indexer, data);
         } else {
-            NdArray array = new NdArrayImpl(shape(), new AtomicDoubleArray(size()));
+            NdIndexer indexer = new NdIndexer(shape());
+            AtomicDoubleArray data = new AtomicDoubleArray(size());
             IntStream
                     .range(0, size())
                     .parallel()
                     .mapToObj(i -> iterator.coordinate(i))
                     .forEach(
                             coordinate ->
-                                    array.put(
-                                            coordinate,
+                                    data.set(
+                                            indexer.pointer(coordinate),
                                             op.apply(this.get(coordinate), other.get(coordinate))
                                     )
                     );
-            return array;
+            return new NdArrayImpl(indexer, data);
         }
     }
 
     @Override
     public NdArray elementwise(Number value, BinaryOperator<Double> op) {
-        NdArray array = new NdArrayImpl(shape(), new AtomicDoubleArray(size()));
+        NdIndexer indexer = new NdIndexer(shape());
+        AtomicDoubleArray data = new AtomicDoubleArray(size());
         IntStream
                 .range(0, size())
                 .parallel()
                 .mapToObj(i -> iterator.coordinate(i))
                 .forEach(coordinate ->
-                        array.put(
-                                coordinate,
-                                op.apply(
-                                        data.get(iterator.pointer(coordinate)),
-                                        value.doubleValue()
-                                )
-                        )
+                    data.set(
+                            indexer.pointer(coordinate),
+                            op.apply(
+                                    get(coordinate),
+                                    value.doubleValue()
+                            )
+                    )
                 );
-        return array;
+        return new NdArrayImpl(indexer, data);
     }
 
     @Override
     public NdArray elementwise(Function<Double, Double> op) {
-        NdArray array = new NdArrayImpl(shape(), new double[size()]);
+        NdIndexer indexer = new NdIndexer(shape());
+        AtomicDoubleArray data = new AtomicDoubleArray(size());
         IntStream.range(0, size())
                 .parallel()
                 .mapToObj(i -> iterator.coordinate(i))
                 .forEach(coordinate ->
-                        array.put(
-                                coordinate,
+                        data.lazySet(
+                                indexer.pointer(coordinate),
                                 op.apply(data.get(iterator.pointer(coordinate)))
                         )
                 );
-        return array;
+        return new NdArrayImpl(indexer, data);
     }
 
     @Override
@@ -258,10 +260,8 @@ public class NdArrayImpl implements NdArray {
             }
             NdArray result = new NdArrayImpl(Arrays.copyOfRange(shape, 0, shape.length - 1));
             result.elementwisei(coordinate -> IntStream.range(0, shape[shape.length - 1])
-                    .mapToDouble(
-                            i ->
-                                    data.get(iterator.pointer(Ints.concat(coordinate, new int[]{i})))
-                                            * other.get(new int[]{i})).sum()
+                    .mapToDouble(i -> get(Ints.concat(coordinate, new int[]{i})) * other.get(new int[]{i}))
+                    .sum()
             );
             return result;
         } else {
