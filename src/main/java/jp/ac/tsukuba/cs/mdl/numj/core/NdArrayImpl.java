@@ -83,7 +83,7 @@ public class NdArrayImpl implements NdArray {
                     .mapToObj(i -> iterator.coordinate(i))
                     .forEach(
                             coordinate ->
-                                    data.set(
+                                    data.lazySet(
                                             indexer.pointer(coordinate),
                                             op.apply(this.get(coordinate), other.get(coordinate))
                                     )
@@ -101,7 +101,7 @@ public class NdArrayImpl implements NdArray {
                 .parallel()
                 .mapToObj(i -> iterator.coordinate(i))
                 .forEach(coordinate ->
-                    data.set(
+                    data.lazySet(
                             indexer.pointer(coordinate),
                             op.apply(
                                     this.get(coordinate),
@@ -122,7 +122,7 @@ public class NdArrayImpl implements NdArray {
                 .forEach(coordinate ->
                         data.lazySet(
                                 indexer.pointer(coordinate),
-                                op.apply(data.get(iterator.pointer(coordinate)))
+                                op.apply(this.get(coordinate))
                         )
                 );
         return new NdArrayImpl(indexer, data);
@@ -145,6 +145,7 @@ public class NdArrayImpl implements NdArray {
     @Override
     public Double axisOperation(BinaryOperator<Double> op) {
         return Arrays.stream(iterator.getPointers())
+                .parallel()
                 .mapToDouble(i -> data.get(i))
                 .reduce(op::apply)
                 .orElseThrow(RuntimeException::new);
@@ -153,6 +154,7 @@ public class NdArrayImpl implements NdArray {
     @Override
     public Integer axisArgOperation(BinaryOperator<Pair<Integer, Double>> op) {
         return Arrays.stream(iterator.getPointers())
+                .parallel()
                 .mapToObj(i -> Pair.of(iterator.pointerIndex(i), data.get(i)))
                 .reduce(op)
                 .map(Pair::getLeft)
@@ -260,6 +262,7 @@ public class NdArrayImpl implements NdArray {
             }
             NdArray result = new NdArrayImpl(Arrays.copyOfRange(shape, 0, shape.length - 1));
             result.elementwisei(coordinate -> IntStream.range(0, shape[shape.length - 1])
+                    .parallel()
                     .mapToDouble(i -> get(Ints.concat(coordinate, new int[]{i})) * other.get(new int[]{i}))
                     .sum()
             );
@@ -475,7 +478,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public void conditionalPut(Predicate<Double> f, double value) {
-        Arrays.stream(iterator.getPointers()).filter(p -> f.test(data.get(p))).forEach(p -> data.set(p, value));
+        Arrays.stream(iterator.getPointers()).parallel().filter(p -> f.test(data.get(p))).forEach(p -> data.lazySet(p, value));
     }
 
     @Override
@@ -517,7 +520,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public void put(int[] cords, double value) {
-        data.set(iterator.pointer(cords), value);
+        data.lazySet(iterator.pointer(cords), value);
     }
 
     @Override

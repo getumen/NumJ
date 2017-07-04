@@ -2,7 +2,8 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class NdArrayImplTest {
     @Test
@@ -18,9 +19,9 @@ public class NdArrayImplTest {
     }
 
     @Test
-    public void dotN3(){
+    public void dotN3() {
         // O(N^3) if in 2 seconds
-        assertArrayEquals(new int[]{100,100},NumJ.arange(100,100).dot(NumJ.arange(100,100)).shape());
+        assertArrayEquals(new int[]{100, 100}, NumJ.arange(100, 100).dot(NumJ.arange(100, 100)).shape());
     }
 
     @Test
@@ -30,10 +31,22 @@ public class NdArrayImplTest {
     }
 
     @Test
+    public void elementwise() throws Exception {
+        assertEquals(
+                NumJ.ones(5, 6).div(10).elementwise(Math::log),
+                NumJ.ones(50, 60).div(10).slice(
+                        new NdIndex[]{
+                                NdSlice.interval(0, 5),
+                                NdSlice.interval(10, 16)
+                        }
+                ).elementwise(Math::log));
+    }
+
+    @Test
     public void max() throws Exception {
-        assertEquals(8., NumJ.arange(3,3).max(),0.0000001);
-        assertEquals(NumJ.create(new double[]{2,5,8}, 3), NumJ.arange(3,3).max(1));
-        assertEquals(NumJ.create(new double[]{6,7,8}, 3), NumJ.arange(3,3).max(0));
+        assertEquals(8., NumJ.arange(3, 3).max(), 0.0000001);
+        assertEquals(NumJ.create(new double[]{2, 5, 8}, 3), NumJ.arange(3, 3).max(1));
+        assertEquals(NumJ.create(new double[]{6, 7, 8}, 3), NumJ.arange(3, 3).max(0));
     }
 
     @Test
@@ -64,7 +77,7 @@ public class NdArrayImplTest {
                 NumJ.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 3, 4),
                 ones.add(NumJ.arange(4, 1).transpose())
         );
-        assertEquals(NumJ.create(new double[]{0,2,4,6,8, 10}, new int[]{2,3}), NumJ.arange(2,3).add(NumJ.arange(2,3)));
+        assertEquals(NumJ.create(new double[]{0, 2, 4, 6, 8, 10}, new int[]{2, 3}), NumJ.arange(2, 3).add(NumJ.arange(2, 3)));
         assertEquals(NumJ.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3), NumJ.arange(2, 3).add(1));
 
         assertEquals(
@@ -72,14 +85,14 @@ public class NdArrayImplTest {
                 NumJ.arange(3, 3)
                         .sub(3)
                         .slice(new NdIndex[]{
-                                new NdIndexInterval(1,3),
+                                new NdIndexInterval(1, 3),
                                 new NdIndexAll()
                         }).add(1));
     }
 
     @Test
     public void addN() throws Exception {
-        assertArrayEquals(new int[]{1000, 1000}, NumJ.arange(1000,1000).add(NumJ.arange(1000,1000)).shape());
+        assertArrayEquals(new int[]{1000, 1000}, NumJ.arange(1000, 1000).add(NumJ.arange(1000, 1000)).shape());
     }
 
     @Test
@@ -130,13 +143,13 @@ public class NdArrayImplTest {
 
     @Test
     public void put() throws Exception {
-        NdArray zero = NumJ.zeros(3,4);
-        for(int i=0;i<3;i++){
-            for(int j=0;j<4;j++){
-                zero.put(new int[]{i,j}, 1);
+        NdArray zero = NumJ.zeros(3, 4);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 4; j++) {
+                zero.put(new int[]{i, j}, 1);
             }
         }
-        assertEquals(NumJ.ones(3,4), zero);
+        assertEquals(NumJ.ones(3, 4), zero);
     }
 
     @Test

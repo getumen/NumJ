@@ -13,13 +13,15 @@ apply plugin: 'java-library'
 
 def repo = new File(rootDir, "repository")
 
+def version = "0.0.11"
+
 apply plugin: 'maven'
 
 uploadArchives {
     repositories {
         mavenDeployer {
             repository url: "file://${repo.absolutePath}"
-            pom.version = '0.0.10'
+            pom.version = "${version}"
             pom.groupId = 'jp.ac.tsukuba.cs.mdl'
             pom.artifactId = 'numj'
         }
