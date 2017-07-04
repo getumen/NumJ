@@ -31,6 +31,8 @@ public class NdArrayImplTest {
 
     @Test
     public void max() throws Exception {
+        assertEquals(8., NumJ.arange(3,3).max(),0.0000001);
+        assertEquals(NumJ.create(new double[]{2,5,8}, 3), NumJ.arange(3,3).max(1));
     }
 
     @Test

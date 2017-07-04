@@ -180,7 +180,7 @@ public class NdArrayImpl implements NdArray {
                     if (Ints.contains(axis, i)) {
                         indices[i] = new NdIndexAll();
                     } else {
-                        indices[i] = new NdIndexPoint(shape[i]);
+                        indices[i] = new NdIndexPoint(coordinate[i]);
                     }
                 }
                 return this.slice(indices).axisOperation(op);
