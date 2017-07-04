@@ -64,6 +64,17 @@ public class NdArrayImplTest {
                 NumJ.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 3, 4),
                 ones.add(NumJ.arange(4, 1).transpose())
         );
+        assertEquals(NumJ.create(new double[]{0,2,4,6,8, 10}, new int[]{2,3}), NumJ.arange(2,3).add(NumJ.arange(2,3)));
+        assertEquals(NumJ.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3), NumJ.arange(2, 3).add(1));
+
+        assertEquals(
+                NumJ.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3),
+                NumJ.arange(3, 3)
+                        .sub(3)
+                        .slice(new NdIndex[]{
+                                new NdIndexInterval(1,3),
+                                new NdIndexAll()
+                        }).add(1));
     }
 
     @Test
@@ -72,17 +83,8 @@ public class NdArrayImplTest {
     }
 
     @Test
-    public void add1() throws Exception {
-        assertEquals(NumJ.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3), NumJ.arange(2, 3).add(1));
-    }
-
-    @Test
     public void sub() throws Exception {
         assertEquals(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3), NumJ.arange(2, 3).sub(NumJ.ones(2, 3)));
-    }
-
-    @Test
-    public void sub1() throws Exception {
         assertEquals(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3), NumJ.arange(2, 3).sub(1));
     }
 

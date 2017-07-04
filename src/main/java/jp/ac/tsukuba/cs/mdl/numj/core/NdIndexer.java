@@ -47,7 +47,7 @@ public class NdIndexer {
 
         this.stride = createStride(shape);
 
-        size = pointers.length;
+        size = computeSize(shape);
 
         this.pointers = pointers;
     }
