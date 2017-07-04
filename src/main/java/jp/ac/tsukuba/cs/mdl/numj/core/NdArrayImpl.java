@@ -75,7 +75,6 @@ public class NdArrayImpl implements NdArray {
                     );
             return new NdArrayImpl(indexer, data);
         } else {
-            NdIndexer indexer = new NdIndexer(shape());
             AtomicDoubleArray data = new AtomicDoubleArray(size());
             IntStream
                     .range(0, size())
@@ -84,17 +83,16 @@ public class NdArrayImpl implements NdArray {
                     .forEach(
                             coordinate ->
                                     data.set(
-                                            indexer.pointer(coordinate),
+                                            iterator.pointer(coordinate),
                                             op.apply(this.get(coordinate), other.get(coordinate))
                                     )
                     );
-            return new NdArrayImpl(indexer, data);
+            return new NdArrayImpl(iterator, data);
         }
     }
 
     @Override
     public NdArray elementwise(Number value, BinaryOperator<Double> op) {
-        NdIndexer indexer = new NdIndexer(shape());
         AtomicDoubleArray data = new AtomicDoubleArray(size());
         IntStream
                 .range(0, size())
@@ -102,14 +100,14 @@ public class NdArrayImpl implements NdArray {
                 .mapToObj(i -> iterator.coordinate(i))
                 .forEach(coordinate ->
                     data.set(
-                            indexer.pointer(coordinate),
+                            iterator.pointer(coordinate),
                             op.apply(
-                                    get(coordinate),
+                                    this.get(coordinate),
                                     value.doubleValue()
                             )
                     )
                 );
-        return new NdArrayImpl(indexer, data);
+        return new NdArrayImpl(iterator, data);
     }
 
     @Override
