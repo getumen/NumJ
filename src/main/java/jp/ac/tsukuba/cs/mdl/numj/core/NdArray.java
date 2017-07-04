@@ -47,6 +47,26 @@ public interface NdArray {
 
     NdArray div(Number other);
 
+    NdArray eq(NdArray other);
+
+    NdArray eq(Number other);
+
+    NdArray gt(NdArray other);
+
+    NdArray gt(Number other);
+
+    NdArray lt(NdArray other);
+
+    NdArray lt(Number other);
+
+    NdArray gte(NdArray other);
+
+    NdArray gte(Number other);
+
+    NdArray lte(NdArray other);
+
+    NdArray lte(Number other);
+
     Double axisOperation(BinaryOperator<Double> op);
 
     NdArray axisOperation(BinaryOperator<Double> op, int... axis);

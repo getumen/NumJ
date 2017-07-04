@@ -303,12 +303,12 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public Integer argmin() {
-        return this.axisArgOperation((l,r)->l.getRight() < r.getRight() ? l : r);
+        return this.axisArgOperation((l, r) -> l.getRight() < r.getRight() ? l : r);
     }
 
     @Override
     public NdArray argmin(int axis) {
-        return this.axisArgOperation((l,r)->l.getRight() < r.getRight()?l:r, axis);
+        return this.axisArgOperation((l, r) -> l.getRight() < r.getRight() ? l : r, axis);
     }
 
     @Override
@@ -323,12 +323,12 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public Double min() {
-        return this.axisOperation((l,r)->l<r?l:r);
+        return this.axisOperation((l, r) -> l < r ? l : r);
     }
 
     @Override
     public NdArray min(int... axis) {
-        return this.axisOperation((l,r)->l<r?l:r, axis);
+        return this.axisOperation((l, r) -> l < r ? l : r, axis);
     }
 
     @Override
@@ -411,6 +411,56 @@ public class NdArrayImpl implements NdArray {
     @Override
     public NdArray mul(Number other) {
         return elementwise(other, (l, r) -> l * r);
+    }
+
+    @Override
+    public NdArray eq(NdArray other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)==0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray eq(Number other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)==0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray gt(NdArray other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)>0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray gt(Number other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)>0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray lt(NdArray other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)<0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray lt(Number other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)<0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray gte(NdArray other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)>=0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray gte(Number other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)>=0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray lte(NdArray other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)<=0 ? 1. : 0.);
+    }
+
+    @Override
+    public NdArray lte(Number other) {
+        return elementwise(other, (l, r) -> l.compareTo(r)<=0 ? 1. : 0.);
     }
 
     @Override

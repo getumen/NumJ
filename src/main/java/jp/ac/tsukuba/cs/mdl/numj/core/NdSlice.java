@@ -1,8 +1,11 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import com.google.common.primitives.Ints;
+import com.google.common.util.concurrent.AtomicDoubleArray;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Factory method for NdIndex
@@ -26,7 +29,15 @@ public class NdSlice {
         return new NdIndexSet(Ints.toArray(set));
     }
 
-    public static NdIndex point(int i){
+    public static NdIndex set(NdArray indices) {
+        if (indices.dim() != 1) {
+            throw new IllegalArgumentException("dimension is not 1");
+        }
+        AtomicDoubleArray data = indices.data();
+        return set(IntStream.range(0, indices.size()).map(i -> (int) data.get(i)).boxed().collect(Collectors.toList()));
+    }
+
+    public static NdIndex point(int i) {
         return new NdIndexPoint(i);
     }
 }
