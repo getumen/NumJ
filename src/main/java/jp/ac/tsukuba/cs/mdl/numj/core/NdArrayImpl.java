@@ -176,11 +176,13 @@ public class NdArrayImpl implements NdArray {
             NdArray result = new NdArrayImpl(newShape);
             result.elementwisei(coordinate -> {
                 NdIndex[] indices = new NdIndex[dim];
+                int cnt = 0;
                 for (int i = 0; i < dim; i++) {
                     if (Ints.contains(axis, i)) {
                         indices[i] = new NdIndexAll();
+                        cnt++;
                     } else {
-                        indices[i] = new NdIndexPoint(coordinate[i]);
+                        indices[i] = new NdIndexPoint(coordinate[i-cnt]);
                     }
                 }
                 return this.slice(indices).axisOperation(op);
