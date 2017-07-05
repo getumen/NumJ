@@ -45,8 +45,8 @@ public class NdArrayImplTest {
     @Test
     public void max() throws Exception {
         assertEquals(8., NumJ.arange(3, 3).max(), 0.0000001);
-        assertEquals(NumJ.create(new double[]{2, 5, 8}, 3), NumJ.arange(3, 3).max(1));
-        assertEquals(NumJ.create(new double[]{6, 7, 8}, 3), NumJ.arange(3, 3).max(0));
+        assertEquals(NumJ.create(new double[]{3, 7, 11}, 3), NumJ.arange(3, 4).max(1));
+        assertEquals(NumJ.create(new double[]{8, 9, 10, 11}, 3), NumJ.arange(3, 4).max(0));
     }
 
     @Test
@@ -115,6 +115,9 @@ public class NdArrayImplTest {
 
     @Test
     public void get() throws Exception {
+        for (int i=0;i<12;i++){
+            assertEquals(i, NumJ.arange(3,4).get(new int[]{i/4, i%4}), 1e-5);
+        }
     }
 
     @Test

@@ -405,6 +405,9 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public double braodcastGet(int[] coordinate) {
+        if (coordinate.length != dim()){
+            throw new IllegalArgumentException();
+        }
         return data.get(iterator.broadcastPointer(coordinate));
     }
 
