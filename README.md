@@ -10,24 +10,13 @@ NumJ requires JDK 1.8 or higher.
 
 - For gradle
 ```$gradle
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'com.layer', name: 'gradle-git-repo-plugin', version: '2.0.2'
-    }
-}
-
-apply plugin: 'git-repo'
-
-// add the following depemdencies.
-
 repositories {
-    github("getumen", "NumJ", "gh-pages", "repository")
+    maven { url 'http://getumen.github.io/NumJ/repository' }
 }
+
+
 dependencies {
-    compile 'jp.ac.tsukuba.cs.mdl:numj:0.0.2'
+    compile 'jp.ac.tsukuba.cs.mdl:numj:0.0.13'
 }
 
 ```
@@ -72,7 +61,7 @@ public class NdArrayImplTest {
 
     @Test
     public void argmax() throws Exception {
-        assertEquals(Integer.valueOf(5), NumJ.arange(3, 2).argmax());
+        assertEquals(5, NumJ.arange(3, 2).argmax());
         assertEquals(NumJ.ones(3), NumJ.arange(3, 2).argmax(1));
     }
 
