@@ -2,6 +2,8 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -121,6 +123,8 @@ public class NdArrayImplTest {
         NdArray a = NumJ.arange(6000);
         for (int i = 0; i < 6000; i++) {
             assertEquals(i, a.get(new int[]{i}), 1e-5);
+            assertEquals(i, a.slice(NdSlice.point(i)).get(new int[]{0}), 1e-5);
+            assertEquals(i, a.slice(NdSlice.point(i)).reshape(1, 1).get(new int[]{0, 0}), 1e-5);
         }
     }
 

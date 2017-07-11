@@ -476,7 +476,7 @@ public class NdArrayImpl implements NdArray {
         if (size() != NdIndexer.computeSize(rearrange)) {
             throw new IllegalArgumentException();
         }
-        return new NdArrayImpl(rearrange, data);
+        return new NdArrayImpl(iterator.reshape(rearrange), data);
     }
 
     @Override
