@@ -115,8 +115,12 @@ public class NdArrayImplTest {
 
     @Test
     public void get() throws Exception {
-        for (int i=0;i<12;i++){
-            assertEquals(i, NumJ.arange(3,4).get(new int[]{i/4, i%4}), 1e-5);
+        for (int i = 0; i < 12; i++) {
+            assertEquals(i, NumJ.arange(3, 4).get(new int[]{i / 4, i % 4}), 1e-5);
+        }
+        NdArray a = NumJ.arange(6000);
+        for (int i = 0; i < 6000; i++) {
+            assertEquals(i, a.get(new int[]{i}), 1e-5);
         }
     }
 

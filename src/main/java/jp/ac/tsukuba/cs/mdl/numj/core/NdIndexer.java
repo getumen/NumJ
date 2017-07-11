@@ -55,29 +55,29 @@ public class NdIndexer {
     public NdIndexer transpose(int... permute) {
         int[] newPointers = new int[size];
         int[] newShape = new int[dim];
-        for(int i=0;i<dim;i++){
+        for (int i = 0; i < dim; i++) {
             newShape[i] = shape[permute[i]];
         }
         int[] newStride = createStride(newShape);
-        for(int i=0;i<size;i++){
+        for (int i = 0; i < size; i++) {
             int[] coordinate = coordinate(i);
-            newPointers[IntStream.range(0, dim).map(j->coordinate[permute[j]]*newStride[j]).sum()] = pointers[i];
+            newPointers[IntStream.range(0, dim).map(j -> coordinate[permute[j]] * newStride[j]).sum()] = pointers[i];
         }
         return new NdIndexer(newShape, newPointers);
     }
 
-    public int[][] allCoordinate(){
+    public int[][] allCoordinate() {
         return allCoordinate(shape);
     }
 
-    public static int[][] allCoordinate(int... shape){
+    public static int[][] allCoordinate(int... shape) {
         List<List<Integer>> lists = Lists.newArrayList();
-        for (int i=0;i<shape.length;i++){
-            lists.add(IntStream.range(0,shape[i]).boxed().collect(Collectors.toList()));
+        for (int i = 0; i < shape.length; i++) {
+            lists.add(IntStream.range(0, shape[i]).boxed().collect(Collectors.toList()));
         }
         List<List<Integer>> coordinates = Lists.cartesianProduct(lists);
         int[][] coords = new int[coordinates.size()][shape.length];
-        for(int i=0;i<coordinates.size();i++){
+        for (int i = 0; i < coordinates.size(); i++) {
             coords[i] = Ints.toArray(coordinates.get(i));
         }
         return coords;
@@ -97,6 +97,9 @@ public class NdIndexer {
     }
 
     public int pointer(int[] coordinate) {
+        if (dim != coordinate.length) {
+            throw new IllegalArgumentException("Dimension not match " + dim + " != " + coordinate.length);
+        }
         return pointers[
                 IntStream
                         .range(0, dim)

@@ -191,7 +191,6 @@ public class NdIndexerTest {
                         .reshape(15, 2, 7)
                         .reshape(5,6,7)
                         .pointer(new int[]{4,5,6})
-
         );
     }
 
