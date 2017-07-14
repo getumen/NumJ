@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -54,23 +53,17 @@ public class NdArrayImpl implements NdArray {
         if (broadcast) {
             int[] shape = shape();
             int[] otherShape = other.shape();
-            List<List<Integer>> lists = Lists.newArrayList();
             int[] newShape = new int[dim()];
             for (int i = 0; i < dim(); i++) {
-                List<Integer> list = IntStream
-                        .range(0, shape[i] > otherShape[i] ? shape[i] : otherShape[i])
-                        .boxed()
-                        .collect(Collectors.toList());
-                lists.add(list);
-                newShape[i] = list.size();
+                newShape[i] = Math.max(shape[i], otherShape[i]);
             }
             NdIndexer indexer = new NdIndexer(newShape);
             AtomicDoubleArray data = new AtomicDoubleArray(
                     Arrays.stream(newShape).reduce((l, r) -> l * r).orElseThrow(RuntimeException::new));
 
-            Lists.cartesianProduct(lists).stream()
+            IntStream.range(0, indexer.getSize())
                     .parallel()
-                    .map(Ints::toArray)
+                    .mapToObj(indexer::coordinate)
                     .forEach(
                             coordinate ->
                                     data.lazySet(
@@ -135,8 +128,9 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray elementwisei(Function<int[], Double> op) {
-        Arrays.stream(iterator.allCoordinate())
+        IntStream.range(0, size())
                 .parallel()
+                .mapToObj(iterator::coordinate)
                 .forEach(
                         coordinate ->
                                 data.lazySet(
@@ -158,9 +152,9 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public Integer axisArgOperation(BinaryOperator<Pair<Integer, Double>> op) {
-        return Arrays.stream(iterator.getPointers())
+        return IntStream.range(0, size())
                 .parallel()
-                .mapToObj(i -> Pair.of(iterator.pointerToIndex(i), data.get(i)))
+                .mapToObj(i -> Pair.of(i, data.get(pointer(i))))
                 .reduce(op)
                 .map(Pair::getLeft)
                 .orElseThrow(RuntimeException::new);
@@ -386,9 +380,9 @@ public class NdArrayImpl implements NdArray {
     }
 
     private static double div(double l, double r) {
-        if(l==0){
+        if (l == 0) {
             return 0;
-        }else if (r == 0) {
+        } else if (r == 0) {
             throw new RuntimeException("Zero division error");
         } else {
             return l / r;

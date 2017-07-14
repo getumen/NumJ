@@ -10,6 +10,10 @@ public class NdIndexPoint implements NdIndex {
         this.point = point;
     }
 
+    public int getPoint() {
+        return point;
+    }
+
     public Optional<Integer> map(Integer i) {
         if (i == point) {
             return Optional.of(i);

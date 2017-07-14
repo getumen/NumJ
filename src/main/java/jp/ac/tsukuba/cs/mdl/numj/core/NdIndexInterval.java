@@ -13,6 +13,14 @@ public class NdIndexInterval implements NdIndex {
         this.end = end;
     }
 
+    public int getStart() {
+        return start;
+    }
+
+    public int getEnd() {
+        return end;
+    }
+
     @Override
     public Optional<Integer> map(Integer i) {
         if (start <= i && i < end) {

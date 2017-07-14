@@ -100,21 +100,19 @@ public class NdIndexer {
         if (dim != coordinate.length) {
             throw new IllegalArgumentException("Dimension not match " + dim + " != " + coordinate.length);
         }
-        return pointers[
-                IntStream
-                        .range(0, dim)
-                        .map(i -> coordinate[i] * stride[i])
-                        .sum()
-                ];
+        int index = 0;
+        for(int i=0;i<dim;i++){
+            index+=coordinate[i]*stride[i];
+        }
+        return pointers[index];
     }
 
     public int broadcastPointer(int[] coordinate) {
-        return pointers[
-                IntStream
-                        .range(0, dim)
-                        .map(i -> (coordinate[i] % shape[i]) * stride[i])
-                        .sum()
-                ];
+        int index = 0;
+        for(int i=0;i<dim;i++){
+            index += (coordinate[i] % shape[i]) * stride[i];
+        }
+        return pointers[index];
     }
 
     public int pointerToIndex(int pointer) {
@@ -145,8 +143,17 @@ public class NdIndexer {
         List<List<Integer>> lst = Lists.newArrayList();
         for (int i = 0; i < dim; i++) {
             List<Integer> l = Lists.newArrayList();
-            for (int j = 0; j < this.shape[i]; j++) {
-                indices[i].map(j).ifPresent(l::add);
+            if (indices[i] instanceof NdIndexPoint){
+                l.add(((NdIndexPoint)indices[i]).getPoint());
+            }else if(indices[i] instanceof NdIndexInterval){
+                NdIndexInterval interval = (NdIndexInterval)indices[i];
+                for (int j=interval.getStart();j<interval.getEnd();j++){
+                    l.add(j);
+                }
+            }else{
+                for (int j = 0; j < this.shape[i]; j++) {
+                    indices[i].map(j).ifPresent(l::add);
+                }
             }
             shape[i] = l.size();
             lst.add(l);
