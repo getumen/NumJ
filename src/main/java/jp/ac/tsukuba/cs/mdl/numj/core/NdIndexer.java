@@ -121,6 +121,8 @@ public class NdIndexer {
         return Arrays.binarySearch(pointers, pointer);
     }
 
+    public int indexToPointer(int index){return pointers[index];}
+
     public int[] coordinate(int index) {
         int[] result = new int[dim];
         for (int i = 0; i < dim; i++) {

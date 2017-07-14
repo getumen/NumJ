@@ -88,12 +88,11 @@ public class NdArrayImpl implements NdArray {
             IntStream
                     .range(0, size())
                     .parallel()
-                    .mapToObj(i -> iterator.coordinate(i))
                     .forEach(
-                            coordinate ->
+                            index ->
                                     data.lazySet(
-                                            indexer.pointer(coordinate),
-                                            op.apply(this.get(coordinate), other.get(coordinate))
+                                            index,
+                                            op.apply(this.data.get(iterator.indexToPointer(index)), other.data().get(other.pointer(index)))
                                     )
                     );
             return new NdArrayImpl(indexer, data);
@@ -107,12 +106,11 @@ public class NdArrayImpl implements NdArray {
         IntStream
                 .range(0, size())
                 .parallel()
-                .mapToObj(i -> iterator.coordinate(i))
-                .forEach(coordinate ->
+                .forEach(index ->
                         data.lazySet(
-                                indexer.pointer(coordinate),
+                                index,
                                 op.apply(
-                                        this.get(coordinate),
+                                        this.data.get(this.iterator.indexToPointer(index)),
                                         value.doubleValue()
                                 )
                         )
@@ -126,11 +124,10 @@ public class NdArrayImpl implements NdArray {
         AtomicDoubleArray data = new AtomicDoubleArray(size());
         IntStream.range(0, size())
                 .parallel()
-                .mapToObj(i -> iterator.coordinate(i))
-                .forEach(coordinate ->
+                .forEach(index ->
                         data.lazySet(
-                                indexer.pointer(coordinate),
-                                op.apply(this.get(coordinate))
+                                index,
+                                op.apply(this.data.get(this.iterator.indexToPointer(index)))
                         )
                 );
         return new NdArrayImpl(indexer, data);
@@ -617,4 +614,8 @@ public class NdArrayImpl implements NdArray {
         }
     }
 
+    @Override
+    public int pointer(int index) {
+        return iterator.indexToPointer(index);
+    }
 }

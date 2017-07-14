@@ -399,4 +399,11 @@ public interface NdArray {
      * @param value: putする値．
      */
     void conditionalPut(Predicate<Double> f, double value);
+
+    /**
+     * NdArrayをベクトルとしてみた時のindexに対応するpointerを返す．
+     * @param index: インデックス．
+     * @return ポインター
+     */
+    int pointer(int index);
 }
