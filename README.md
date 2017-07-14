@@ -6,6 +6,9 @@ NumJ requires JDK 1.8 or higher.
 ## Version
 *0.0.4*
 
+## Documentation
+https://getumen.github.io/NumJ/doc
+
 ## Installation
 
 - For gradle
@@ -20,9 +23,6 @@ dependencies {
 }
 
 ```  
-
-## Documentation
-https://getumen.github.io/NumJ/documentation
 
 ## Code Example
 
