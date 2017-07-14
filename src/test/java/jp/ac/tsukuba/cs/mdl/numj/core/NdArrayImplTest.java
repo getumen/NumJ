@@ -4,8 +4,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class NdArrayImplTest {
     @Test
@@ -104,7 +103,9 @@ public class NdArrayImplTest {
     }
 
     @Test
-    public void checkDemensions() throws Exception {
+    public void checkBroadcast() throws Exception {
+	assertTrue(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3).checkBroadcast(NumJ.arange(2, 3)));
+	assertFalse(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3).checkBroadcast(NumJ.arange(2, 3, 3)));
     }
 
     @Test
