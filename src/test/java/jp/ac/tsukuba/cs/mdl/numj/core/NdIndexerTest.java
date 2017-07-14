@@ -30,8 +30,13 @@ public class NdIndexerTest {
         assertArrayEquals(new int[]{10, 10, 10, 20}, sliced.getShape());
         NdIndexer reshaped = sliced.reshape(20000);
         assertEquals(
+<<<<<<< HEAD
                 indexer.pointer(new int[]{9, 19, 19, 20}),
                 reshaped.pointer(new int[]{19999})
+=======
+                indexer.pointer(new int[]{9, 19, 19, 20 }),
+                reshaped.pointer(new int[]{19999}) // java.lang.IllegalArgumentException at NdIndexerTest.java:34
+>>>>>>> ba81edb57f315a93ef82b4e85a8951dc3c79884e
         );
         NdIndexer tmp = reshaped.reshape(10, 10, 10, 20).transpose(1, 3, 0, 2);
         assertEquals(
