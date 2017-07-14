@@ -66,23 +66,6 @@ public class NdIndexer {
         return new NdIndexer(newShape, newPointers);
     }
 
-    public int[][] allCoordinate() {
-        return allCoordinate(shape);
-    }
-
-    public static int[][] allCoordinate(int... shape) {
-        List<List<Integer>> lists = Lists.newArrayList();
-        for (int i = 0; i < shape.length; i++) {
-            lists.add(IntStream.range(0, shape[i]).boxed().collect(Collectors.toList()));
-        }
-        List<List<Integer>> coordinates = Lists.cartesianProduct(lists);
-        int[][] coords = new int[coordinates.size()][shape.length];
-        for (int i = 0; i < coordinates.size(); i++) {
-            coords[i] = Ints.toArray(coordinates.get(i));
-        }
-        return coords;
-    }
-
     public NdIndexer reshape(int... shape) {
         return new NdIndexer(shape, pointers);
     }
@@ -101,25 +84,34 @@ public class NdIndexer {
             throw new IllegalArgumentException("Dimension not match " + dim + " != " + coordinate.length);
         }
         int index = 0;
-        for(int i=0;i<dim;i++){
-            index+=coordinate[i]*stride[i];
+        for (int i = 0; i < dim; i++) {
+            index += coordinate[i] * stride[i];
         }
         return pointers[index];
     }
 
     public int broadcastPointer(int[] coordinate) {
         int index = 0;
-        for(int i=0;i<dim;i++){
+        for (int i = 0; i < dim; i++) {
             index += (coordinate[i] % shape[i]) * stride[i];
         }
         return pointers[index];
     }
 
+    /**
+     * pointer to index O(log N)
+     * slow!
+     *
+     * @param pointer: ポインタ．
+     * @return インデックス
+     */
     public int pointerToIndex(int pointer) {
         return Arrays.binarySearch(pointers, pointer);
     }
 
-    public int indexToPointer(int index){return pointers[index];}
+    public int indexToPointer(int index) {
+        return pointers[index];
+    }
 
     public int[] coordinate(int index) {
         int[] result = new int[dim];
@@ -143,14 +135,14 @@ public class NdIndexer {
         List<List<Integer>> lst = Lists.newArrayList();
         for (int i = 0; i < dim; i++) {
             List<Integer> l = Lists.newArrayList();
-            if (indices[i] instanceof NdIndexPoint){
-                l.add(((NdIndexPoint)indices[i]).getPoint());
-            }else if(indices[i] instanceof NdIndexInterval){
-                NdIndexInterval interval = (NdIndexInterval)indices[i];
-                for (int j=interval.getStart();j<interval.getEnd();j++){
+            if (indices[i] instanceof NdIndexPoint) {
+                l.add(((NdIndexPoint) indices[i]).getPoint());
+            } else if (indices[i] instanceof NdIndexInterval) {
+                NdIndexInterval interval = (NdIndexInterval) indices[i];
+                for (int j = interval.getStart(); j < interval.getEnd(); j++) {
                     l.add(j);
                 }
-            }else{
+            } else {
                 for (int j = 0; j < this.shape[i]; j++) {
                     indices[i].map(j).ifPresent(l::add);
                 }
@@ -183,25 +175,6 @@ public class NdIndexer {
         }
         return shapeView;
     }
-
-    Map<int[], Integer> pointerMapping() {
-        List<List<Integer>> list = Lists.newArrayList();
-        int[] shapeView = getShape();
-        for (int i = 0; i < dim; i++) {
-            list.add(
-                    IntStream.range(0, shapeView[i])
-                            .boxed()
-                            .collect(Collectors.toList())
-            );
-        }
-        return Lists.cartesianProduct(list).stream()
-                .map(Ints::toArray)
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        this::pointer
-                ));
-    }
-
 
     public int[] getStride() {
         return stride;
