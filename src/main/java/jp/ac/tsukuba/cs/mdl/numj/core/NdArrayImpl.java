@@ -13,11 +13,19 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * NdArrayImplはNumpyのndarrayを元にした、NdArrayのImplementationである．
+ * すべての要素は{@code double}型であるわされる．
+ *
+ * @author getumen
+ * @since 0.0.1
+ */
 public class NdArrayImpl implements NdArray {
 
     protected AtomicDoubleArray data;
 
     protected NdIndexer iterator;
+
 
     public NdArrayImpl(int[] shape) {
         this.iterator = new NdIndexer(shape);
@@ -68,8 +76,8 @@ public class NdArrayImpl implements NdArray {
                                     data.lazySet(
                                             indexer.pointer(coordinate),
                                             op.apply(
-                                                    this.braodcastGet(coordinate),
-                                                    other.braodcastGet(coordinate)
+                                                    this.broadcastGet(coordinate),
+                                                    other.broadcastGet(coordinate)
                                             )
                                     )
                     );
@@ -101,13 +109,13 @@ public class NdArrayImpl implements NdArray {
                 .parallel()
                 .mapToObj(i -> iterator.coordinate(i))
                 .forEach(coordinate ->
-                    data.lazySet(
-                            indexer.pointer(coordinate),
-                            op.apply(
-                                    this.get(coordinate),
-                                    value.doubleValue()
-                            )
-                    )
+                        data.lazySet(
+                                indexer.pointer(coordinate),
+                                op.apply(
+                                        this.get(coordinate),
+                                        value.doubleValue()
+                                )
+                        )
                 );
         return new NdArrayImpl(indexer, data);
     }
@@ -186,7 +194,7 @@ public class NdArrayImpl implements NdArray {
                         indices[i] = new NdIndexAll();
                         cnt++;
                     } else {
-                        indices[i] = new NdIndexPoint(coordinate[i-cnt]);
+                        indices[i] = new NdIndexPoint(coordinate[i - cnt]);
                     }
                 }
                 return this.slice(indices).axisOperation(op);
@@ -380,14 +388,22 @@ public class NdArrayImpl implements NdArray {
         return broadcast;
     }
 
+    private static double div(double l, double r) {
+        if (r == 0) {
+            throw new RuntimeException("Zero division error");
+        } else {
+            return l / r;
+        }
+    }
+
     @Override
     public NdArray div(NdArray other) {
-        return elementwise(other, (l, r) -> r == 0 ? Double.POSITIVE_INFINITY : l / r);
+        return elementwise(other, (l, r) -> div(l, r));
     }
 
     @Override
     public NdArray div(Number other) {
-        return elementwise(other, (l, r) -> r == 0 ? Double.POSITIVE_INFINITY : l / r);
+        return elementwise(other, (l, r) -> div(l, r));
     }
 
     @Override
@@ -404,8 +420,8 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
-    public double braodcastGet(int[] coordinate) {
-        if (coordinate.length != dim()){
+    public double broadcastGet(int[] coordinate) {
+        if (coordinate.length != dim()) {
             throw new IllegalArgumentException();
         }
         return data.get(iterator.broadcastPointer(coordinate));
@@ -522,8 +538,8 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
-    public void put(int[] cords, double value) {
-        data.lazySet(iterator.pointer(cords), value);
+    public void put(int[] coodinate, double value) {
+        data.lazySet(iterator.pointer(coodinate), value);
     }
 
     @Override
@@ -556,7 +572,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray transpose(int... dim) {
-        return new NdArrayImpl(dim, data);
+        return new NdArrayImpl(iterator.transpose(dim), data);
     }
 
     private StringBuffer stringfyMatrix(StringBuffer sb, int index, int[] channel) {
