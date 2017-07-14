@@ -31,7 +31,7 @@ public class NdIndexerTest {
         NdIndexer reshaped = sliced.reshape(20000);
         assertEquals(
                 indexer.pointer(new int[]{9, 19, 19, 20 }),
-                reshaped.pointer(new int[]{19999,0,0,0})
+                reshaped.pointer(new int[]{19999}) // java.lang.IllegalArgumentException at NdIndexerTest.java:34
         );
         NdIndexer tmp = reshaped.reshape(10,10,10,20).transpose(1,3,0,2);
         assertEquals(
