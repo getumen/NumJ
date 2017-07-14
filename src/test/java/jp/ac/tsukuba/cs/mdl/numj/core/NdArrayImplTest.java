@@ -4,8 +4,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class NdArrayImplTest {
     @Test
@@ -58,14 +57,25 @@ public class NdArrayImplTest {
 
     @Test
     public void shape() throws Exception {
+        assertArrayEquals(new int[]{3, 4, 5}, NumJ.ones(3, 4, 5).shape());
+        assertFalse(Arrays.equals(new int[]{3, 4, 5}, NumJ.ones(3, 4, 4).shape()));
+        assertFalse(Arrays.equals(new int[]{3, 4, 5}, NumJ.ones(3, 20).shape()));
     }
 
     @Test
     public void data() throws Exception {
+        assertEquals(
+                NumJ.arange(10, 10).data().toString(),
+                NumJ.arange(10, 10).transpose().slice(NdSlice.interval(3, 7), NdSlice.all()).reshape(40).data().toString()
+        );
     }
 
     @Test
     public void copy() throws Exception {
+        NdArray a = NumJ.arange(100);
+        NdArray b = a.copy();
+        assertFalse(a == b);
+        assertEquals(a, b);
     }
 
     @Test
