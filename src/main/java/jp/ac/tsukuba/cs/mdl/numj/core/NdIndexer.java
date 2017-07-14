@@ -70,7 +70,7 @@ public class NdIndexer {
         return new NdIndexer(shape, pointers);
     }
 
-    private static int[] createStride(int... shape) {
+    public static int[] createStride(int... shape) {
         int[] stride = new int[shape.length];
         stride[shape.length - 1] = 1;
         for (int i = shape.length - 2; i >= 0; i--) {

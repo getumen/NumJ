@@ -45,6 +45,16 @@ public class NdArrayImpl implements NdArray {
         this.iterator = iterator;
     }
 
+    private static double div(double l, double r) {
+        if (l == 0) {
+            return 0;
+        } else if (r == 0) {
+            throw new RuntimeException("Zero division error");
+        } else {
+            return l / r;
+        }
+    }
+
     @Override
     public NdArray elementwise(NdArray other, BinaryOperator<Double> op) {
 
@@ -260,10 +270,15 @@ public class NdArrayImpl implements NdArray {
                 throw new NdArrayException(this, other);
             }
             NdArray result = new NdArrayImpl(Arrays.copyOfRange(shape, 0, shape.length - 1));
-            result.elementwisei(coordinate -> IntStream.range(0, shape[shape.length - 1])
-                    .parallel()
-                    .mapToDouble(i -> get(Ints.concat(coordinate, new int[]{i})) * other.get(new int[]{i}))
-                    .sum()
+            result.elementwisei(coordinate -> {
+                        final int index = IntStream.range(0, dim() - 1)
+                                .map(i -> coordinate[i] * iterator.getStride()[i])
+                                .sum();
+                        return IntStream.range(0, shape[shape.length - 1])
+                                .parallel()
+                                .mapToDouble(i -> get(index + i) * other.get(i))
+                                .sum();
+                    }
             );
             return result;
         } else {
@@ -279,14 +294,18 @@ public class NdArrayImpl implements NdArray {
             }
             newShape[newShape.length - 1] = otherShape[otherShape.length - 1];
             NdArray result = new NdArrayImpl(newShape);
+            int[] otherStride = NdIndexer.createStride(otherShape);
             result.elementwisei(coordinate -> {
-                int[] first = Arrays.copyOfRange(coordinate, 0, shape.length - 1);
+                final int index = IntStream.range(0, dim() - 1)
+                        .map(i -> coordinate[i] * iterator.getStride()[i])
+                        .sum();
+                final int otherIndex = IntStream.range(0, other.dim())
+                        .filter(i -> i != other.dim() - 2)
+                        .map(i -> otherStride[i] * coordinate[(i > other.dim() - 2 ? i - 1 : i) + shape.length - 1]).sum();
+
                 double ret = 0;
                 for (int i = 0; i < shape[shape.length - 1]; i++) {
-                    List<Integer> last = Lists.newArrayList();
-                    last.addAll(Ints.asList(coordinate).subList(shape.length - 1, newShape.length));
-                    last.add(last.size() - 1, i);
-                    ret += data.get(iterator.pointer(Ints.concat(first, new int[]{i}))) * other.get(Ints.toArray(last));
+                    ret += this.get(index + i) * other.get(otherStride[other.dim() - 2] * i + otherIndex);
                 }
                 return ret;
             });
@@ -303,7 +322,6 @@ public class NdArrayImpl implements NdArray {
     public NdArray argmax(int axis) {
         return this.axisArgOperation((l, r) -> l.getRight() > r.getRight() ? l : r, axis);
     }
-
 
     @Override
     public Integer argmin() {
@@ -377,16 +395,6 @@ public class NdArrayImpl implements NdArray {
             } else throw new NdArrayException(this, other);
         }
         return broadcast;
-    }
-
-    private static double div(double l, double r) {
-        if (l == 0) {
-            return 0;
-        } else if (r == 0) {
-            throw new RuntimeException("Zero division error");
-        } else {
-            return l / r;
-        }
     }
 
     @Override
