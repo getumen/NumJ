@@ -85,7 +85,7 @@ public class NdArrayImpl implements NdArray {
                             index ->
                                     data.lazySet(
                                             index,
-                                            op.apply(this.data.get(iterator.indexToPointer(index)), other.data().get(other.pointer(index)))
+                                            op.apply(this.get(index), other.get(index))
                                     )
                     );
             return new NdArrayImpl(indexer, data);
@@ -103,7 +103,7 @@ public class NdArrayImpl implements NdArray {
                         data.lazySet(
                                 index,
                                 op.apply(
-                                        this.data.get(this.iterator.indexToPointer(index)),
+                                        this.get(index),
                                         value.doubleValue()
                                 )
                         )
@@ -120,7 +120,7 @@ public class NdArrayImpl implements NdArray {
                 .forEach(index ->
                         data.lazySet(
                                 index,
-                                op.apply(this.data.get(this.iterator.indexToPointer(index)))
+                                op.apply(this.get(index))
                         )
                 );
         return new NdArrayImpl(indexer, data);
@@ -410,6 +410,11 @@ public class NdArrayImpl implements NdArray {
     @Override
     public double get(int... coordinate) {
         return data.get(iterator.pointer(coordinate));
+    }
+
+    @Override
+    public double get(int index) {
+        return data.get(iterator.indexToPointer(index));
     }
 
     @Override

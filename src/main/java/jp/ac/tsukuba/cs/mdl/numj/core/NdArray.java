@@ -315,6 +315,13 @@ public interface NdArray {
     double get(int[] coordinate);
 
     /**
+     * NdArrayを一次元の配列として見た時のindexに対応する値を返す．
+     * @param index: NdArrayを一次元の配列として見た時のindex
+     * @return 対応する値
+     */
+    double get(int index);
+
+    /**
      * @param op: 条件式
      * @return opを満たすとき1,満たさない時0を返す、
      */
