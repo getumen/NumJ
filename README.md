@@ -12,6 +12,7 @@ NumJ requires JDK 1.8 or higher.
 ## Installation
 
 - For gradle  
+
 ```$gradle
 repositories {
     maven { url 'http://getumen.github.io/NumJ/repository' }
