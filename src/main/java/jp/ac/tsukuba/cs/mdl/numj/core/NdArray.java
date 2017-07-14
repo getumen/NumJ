@@ -40,7 +40,7 @@ public interface NdArray {
     NdArray copy();
 
     /**
-     * @return Broadcastをして、引数のNdArrayと要素ごとの計算が可能かどうかを判定する．
+     * @return Broadcastが必要かどうかを判定する．
      */
     boolean checkBroadcast(NdArray other);
 

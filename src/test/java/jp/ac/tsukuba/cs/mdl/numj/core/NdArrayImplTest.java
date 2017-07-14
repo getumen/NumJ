@@ -115,8 +115,8 @@ public class NdArrayImplTest {
 
     @Test
     public void checkBroadcast() throws Exception {
-	assertTrue(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3).checkBroadcast(NumJ.arange(2, 3)));
-	assertFalse(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3).checkBroadcast(NumJ.arange(2, 3, 3)));
+        assertTrue(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3).checkBroadcast(NumJ.arange(2, 3)));
+        assertFalse(NumJ.create(new double[]{-1, 0, 1, 2, 3, 4}, 2, 3).checkBroadcast(NumJ.arange(2, 3, 3)));
     }
 
     @Test
