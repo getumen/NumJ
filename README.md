@@ -21,6 +21,9 @@ dependencies {
 
 ```
 
+## Documentation
+https://getumen.github.io/NumJ/documentation
+
 ## Code Example
 
 ```java
