@@ -19,7 +19,7 @@ dependencies {
     compile 'jp.ac.tsukuba.cs.mdl:numj:0.0.13'
 }
 
-```
+```  
 
 ## Documentation
 https://getumen.github.io/NumJ/documentation
