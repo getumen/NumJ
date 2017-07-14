@@ -103,7 +103,7 @@ public class NdIndexerTest {
         assertArrayEquals(
                 new int[]{1, 2, 3},
                 sliceInterval.coordinate(
-                        sliceInterval.pointerIndex(
+                        sliceInterval.pointerToIndex(
                                 sliceInterval.pointer(new int[]{1, 2, 3})
                         )
                 )
@@ -127,7 +127,7 @@ public class NdIndexerTest {
         assertArrayEquals(
                 new int[]{1, 2, 3},
                 sliceSet.coordinate(
-                        sliceSet.pointerIndex(
+                        sliceSet.pointerToIndex(
                                 sliceSet.pointer(new int[]{1, 2, 3})
                         )
                 )

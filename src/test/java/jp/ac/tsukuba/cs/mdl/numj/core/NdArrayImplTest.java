@@ -204,13 +204,23 @@ public class NdArrayImplTest {
 
     @Test
     public void put() throws Exception {
+        int c = 0;
         NdArray zero = NumJ.zeros(3, 4);
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 4; j++) {
-                zero.put(new int[]{i, j}, 1);
+                zero.put(new int[]{i, j}, c++);
             }
         }
-        assertEquals(NumJ.ones(3, 4), zero);
+        assertEquals(NumJ.arange(3, 4), zero);
+
+        c = 0;
+        zero = NumJ.zeros(3, 4).reshape(4, 3);
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                zero.put(new int[]{i, j}, c++);
+            }
+        }
+        assertEquals(NumJ.arange(4, 3), zero);
     }
 
     @Test

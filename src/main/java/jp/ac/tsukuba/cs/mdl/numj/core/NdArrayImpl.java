@@ -163,7 +163,7 @@ public class NdArrayImpl implements NdArray {
     public Integer axisArgOperation(BinaryOperator<Pair<Integer, Double>> op) {
         return Arrays.stream(iterator.getPointers())
                 .parallel()
-                .mapToObj(i -> Pair.of(iterator.pointerIndex(i), data.get(i)))
+                .mapToObj(i -> Pair.of(iterator.pointerToIndex(i), data.get(i)))
                 .reduce(op)
                 .map(Pair::getLeft)
                 .orElseThrow(RuntimeException::new);
@@ -389,7 +389,9 @@ public class NdArrayImpl implements NdArray {
     }
 
     private static double div(double l, double r) {
-        if (r == 0) {
+        if(l==0){
+            return 0;
+        }else if (r == 0) {
             throw new RuntimeException("Zero division error");
         } else {
             return l / r;

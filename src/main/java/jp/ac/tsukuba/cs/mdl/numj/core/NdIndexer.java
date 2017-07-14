@@ -117,7 +117,7 @@ public class NdIndexer {
                 ];
     }
 
-    public int pointerIndex(int pointer) {
+    public int pointerToIndex(int pointer) {
         return Arrays.binarySearch(pointers, pointer);
     }
 

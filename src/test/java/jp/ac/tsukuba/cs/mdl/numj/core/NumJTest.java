@@ -26,6 +26,6 @@ public class NumJTest {
 
     @Test
     public void eye(){
-        System.out.println(NumJ.eye(3,4,1));
+        System.out.println(NumJ.eye(5,6,0));
     }
 }

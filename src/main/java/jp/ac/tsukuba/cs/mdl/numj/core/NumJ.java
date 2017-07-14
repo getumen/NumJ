@@ -48,9 +48,9 @@ public class NumJ {
 
     public static NdArray eye(int n, int m, int k) {
         NdArray result = NumJ.zeros(n, m);
-        if (-n <= k && k < n && -m <= k && k < m) {
-            for (int i = 0; i < Math.min(n, m) - Math.abs(k); i++) {
-                result.put(new int[]{(k + i + n) % n, (k + i + m) % m}, 1.);
+        for (int i = -k; i < Math.max(n, m) - k; i++) {
+            if (0 <= i && i < n) {
+                result.put(new int[]{i, i + k}, 1.);
             }
         }
         return result;
