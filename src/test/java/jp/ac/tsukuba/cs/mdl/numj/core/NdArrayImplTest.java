@@ -107,6 +107,7 @@ public class NdArrayImplTest {
         NdArray b = a.copy();
         assertFalse(a == b);
         assertEquals(a, b);
+        assertEquals(NumJ.create(new double[]{90, 91,92,93,94,95,96,97,98,99}, 10), a.slice(NdSlice.interval(90,100)).copy());
     }
 
     @Test
