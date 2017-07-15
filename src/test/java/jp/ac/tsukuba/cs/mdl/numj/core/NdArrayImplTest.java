@@ -41,6 +41,13 @@ public class NdArrayImplTest {
                 22566300, 22581090, 22595880, 22610670, 22625460, 22640250,
                 22655040, 22669830, 22684620, 22699410}, 10, 10), array1.transpose().dot(array2));
 
+        assertEquals(NumJ.create(new double[]{
+                80,  92, 104, 116,
+                92, 107, 122, 137,
+                104, 122, 140, 158,
+                116, 137, 158, 179}, 4, 4),
+                NumJ.arange(3,4).transpose().dot(NumJ.arange(3,4)));
+
     }
 
     @Test
@@ -159,6 +166,7 @@ public class NdArrayImplTest {
 
     @Test
     public void div() throws Exception {
+        assertEquals(NumJ.ones(3,4), NumJ.generator(()->4., 3,4).div(4));
     }
 
     @Test
