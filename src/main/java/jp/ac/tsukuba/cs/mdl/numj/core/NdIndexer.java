@@ -10,6 +10,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * N次配列を１次配列にマッピングするクラス
+ */
 public class NdIndexer {
 
     private int[] pointers;
