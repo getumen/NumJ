@@ -7,6 +7,10 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * NumPyを元にしたN-Dimensional Array．
+ * N次元のテンソルを一次元の配列を用いて表し、各要素へのアクセスを定数時間で行うことができる．
+ */
 public interface NdArray {
 
     /**
