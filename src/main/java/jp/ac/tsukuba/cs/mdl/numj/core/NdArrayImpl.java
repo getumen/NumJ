@@ -49,7 +49,8 @@ public class NdArrayImpl implements NdArray {
         if (l == 0) {
             return 0;
         } else if (r == 0) {
-            throw new RuntimeException("Zero division error");
+            System.err.println("Divided by zero in div");
+            return Float.POSITIVE_INFINITY;
         } else {
             return l / r;
         }
@@ -213,18 +214,19 @@ public class NdArrayImpl implements NdArray {
         newShape = new int[dim - 1];
         int p = 0;
         for (int i = 0; i < dim(); i++) {
-            if (!(axis == i)) {
+            if (axis != i) {
                 newShape[p++] = shape[i];
             }
         }
         NdArray result = new NdArrayImpl(newShape);
         result.elementwisei(coordinate -> {
             NdIndex[] indices = new NdIndex[dim];
+            int pointer = 0;
             for (int i = 0; i < dim; i++) {
                 if (axis == i) {
                     indices[i] = new NdIndexAll();
                 } else {
-                    indices[i] = new NdIndexPoint(coordinate[i]);
+                    indices[i] = new NdIndexPoint(coordinate[pointer++]);
                 }
             }
 
@@ -315,42 +317,42 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public Integer argmax() {
-        return this.axisArgOperation((l, r) -> l.getRight() > r.getRight() ? l : r);
+        return this.axisArgOperation((l, r) -> l.getRight() >= r.getRight() ? l : r);
     }
 
     @Override
     public NdArray argmax(int axis) {
-        return this.axisArgOperation((l, r) -> l.getRight() > r.getRight() ? l : r, axis);
+        return this.axisArgOperation((l, r) -> l.getRight() >= r.getRight() ? l : r, axis);
     }
 
     @Override
     public Integer argmin() {
-        return this.axisArgOperation((l, r) -> l.getRight() < r.getRight() ? l : r);
+        return this.axisArgOperation((l, r) -> l.getRight() <= r.getRight() ? l : r);
     }
 
     @Override
     public NdArray argmin(int axis) {
-        return this.axisArgOperation((l, r) -> l.getRight() < r.getRight() ? l : r, axis);
+        return this.axisArgOperation((l, r) -> l.getRight() <= r.getRight() ? l : r, axis);
     }
 
     @Override
     public Double max() {
-        return this.axisOperation((l, r) -> l > r ? l : r);
+        return this.axisOperation((l, r) -> l >= r ? l : r);
     }
 
     @Override
     public NdArray max(int... axis) {
-        return this.axisOperation((l, r) -> l > r ? l : r, axis);
+        return this.axisOperation((l, r) -> l >= r ? l : r, axis);
     }
 
     @Override
     public Double min() {
-        return this.axisOperation((l, r) -> l < r ? l : r);
+        return this.axisOperation((l, r) -> l <= r ? l : r);
     }
 
     @Override
     public NdArray min(int... axis) {
-        return this.axisOperation((l, r) -> l < r ? l : r, axis);
+        return this.axisOperation((l, r) -> l <= r ? l : r, axis);
     }
 
     @Override

@@ -9,8 +9,8 @@ public class NumJTest {
 
     @Test
     public void ones() {
-        assertEquals(NumJ.create(new double[]{1, 1, 1, 1}, new int[]{2, 2}), NumJ.ones(2, 2));
-        assertNotEquals(NumJ.create(new double[]{1, 1, 1, 2}, new int[]{2, 2}), NumJ.ones(2, 2));
+        assertEquals(NumJ.create(new double[]{1, 1, 1, 1}, 2, 2), NumJ.ones(2, 2));
+        assertNotEquals(NumJ.create(new double[]{1, 1, 1, 2}, 2, 2), NumJ.ones(2, 2));
     }
 
     @Test

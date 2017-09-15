@@ -2,21 +2,70 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
+import javax.swing.plaf.SliderUI;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
 public class NdArrayImplTest {
     @Test
+    public void eq() throws Exception {
+        assertEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).eq(NumJ.arange(3, 4)));
+        assertNotEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).eq(NumJ.ones(3, 4)));
+    }
+
+    @Test
+    public void gt() throws Exception {
+        assertEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).add(1).gt(NumJ.arange(3, 4)));
+        assertEquals(NumJ.zeros(3, 4), NumJ.arange(3, 4).sub(1).gt(NumJ.arange(3, 4)));
+    }
+
+    @Test
+    public void lt() throws Exception {
+        assertEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).sub(1).lt(NumJ.arange(3, 4)));
+        assertEquals(NumJ.zeros(3, 4), NumJ.arange(3, 4).add(1).lt(NumJ.arange(3, 4)));
+    }
+
+    @Test
+    public void gte() throws Exception {
+        assertEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).add(1).gte(NumJ.arange(3, 4)));
+        assertEquals(NumJ.zeros(3, 4), NumJ.arange(3, 4).sub(1).gte(NumJ.arange(3, 4)));
+        assertEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).gte(NumJ.arange(3, 4)));
+
+    }
+
+    @Test
+    public void lte() throws Exception {
+
+        assertEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).sub(1).lte(NumJ.arange(3, 4)));
+        assertEquals(NumJ.zeros(3, 4), NumJ.arange(3, 4).add(1).lte(NumJ.arange(3, 4)));
+        assertEquals(NumJ.ones(3, 4), NumJ.arange(3, 4).lte(NumJ.arange(3, 4)));
+
+    }
+
+    @Test
+    public void sum() throws Exception {
+        assertEquals(Double.valueOf(15), NumJ.arange(6).sum());
+        assertEquals(NumJ.create(new double[]{3, 5, 7}, 2), NumJ.arange(2, 3).sum(0));
+        assertEquals(NumJ.create(new double[]{3, 12}, 2), NumJ.arange(2, 3).sum(1));
+    }
+
+    @Test
+    public void argmin() throws Exception {
+        assertEquals(Integer.valueOf(0), NumJ.arange(3, 2).argmin());
+        assertEquals(NumJ.zeros(2), NumJ.ones(3, 2).argmin(0));
+    }
+
+    @Test
     public void dot() throws Exception {
         NdArray arange1 = NumJ.arange(3, 4);
         NdArray arange2 = NumJ.arange(4, 2);
         assertArrayEquals(new int[]{3, 2}, arange1.dot(arange2).shape());
-        assertEquals(NumJ.create(new double[]{28, 34, 76, 98, 124, 162}, new int[]{3, 2}), arange1.dot(arange2));
+        assertEquals(NumJ.create(new double[]{28, 34, 76, 98, 124, 162}, 3, 2), arange1.dot(arange2));
         NdArray vec = NumJ.arange(4);
         assertEquals(1, arange1.dot(vec).dim());
         assertArrayEquals(new int[]{3}, arange1.dot(vec).shape());
-        assertEquals(NumJ.create(new double[]{14, 38, 62}, new int[]{3}), arange1.dot(vec));
+        assertEquals(NumJ.create(new double[]{14, 38, 62}, 3), arange1.dot(vec));
 
         NdArray array1 = NumJ.arange(100, 100).slice(NdSlice.interval(10, 20), NdSlice.interval(20, 30));
         NdArray array2 = NumJ.arange(100, 100).slice(NdSlice.interval(10, 20), NdSlice.interval(20, 30));
@@ -42,11 +91,11 @@ public class NdArrayImplTest {
                 22655040, 22669830, 22684620, 22699410}, 10, 10), array1.transpose().dot(array2));
 
         assertEquals(NumJ.create(new double[]{
-                80,  92, 104, 116,
-                92, 107, 122, 137,
-                104, 122, 140, 158,
-                116, 137, 158, 179}, 4, 4),
-                NumJ.arange(3,4).transpose().dot(NumJ.arange(3,4)));
+                        80, 92, 104, 116,
+                        92, 107, 122, 137,
+                        104, 122, 140, 158,
+                        116, 137, 158, 179}, 4, 4),
+                NumJ.arange(3, 4).transpose().dot(NumJ.arange(3, 4)));
 
     }
 
@@ -60,6 +109,7 @@ public class NdArrayImplTest {
     public void argmax() throws Exception {
         assertEquals(Integer.valueOf(5), NumJ.arange(3, 2).argmax());
         assertEquals(NumJ.ones(3), NumJ.arange(3, 2).argmax(1));
+        assertEquals(NumJ.ones(2).mul(2), NumJ.arange(3, 2).argmax(0));
     }
 
     @Test
@@ -67,10 +117,8 @@ public class NdArrayImplTest {
         assertEquals(
                 NumJ.ones(5, 6).div(10).elementwise(Math::log),
                 NumJ.ones(50, 60).div(10).slice(
-                        new NdIndex[]{
-                                NdSlice.interval(0, 5),
-                                NdSlice.interval(10, 16)
-                        }
+                        NdSlice.interval(0, 5),
+                        NdSlice.interval(10, 16)
                 ).elementwise(Math::log));
     }
 
@@ -84,6 +132,17 @@ public class NdArrayImplTest {
     @Test
     public void size() throws Exception {
         assertEquals(3 * 4 * 5, NumJ.ones(3, 4, 5).size());
+        assertEquals(3 * 4 * 5, NumJ.ones(3, 5, 4).size());
+        assertNotEquals(3 * 4, NumJ.ones(3, 4, 5).size());
+        assertEquals(
+                3 * 2 * 1,
+                NumJ.ones(3, 4, 5)
+                        .slice(
+                                NdSlice.all(),
+                                NdSlice.interval(1, 3),
+                                NdSlice.point(2))
+                        .size());
+
     }
 
     @Test
@@ -91,14 +150,28 @@ public class NdArrayImplTest {
         assertArrayEquals(new int[]{3, 4, 5}, NumJ.ones(3, 4, 5).shape());
         assertFalse(Arrays.equals(new int[]{3, 4, 5}, NumJ.ones(3, 4, 4).shape()));
         assertFalse(Arrays.equals(new int[]{3, 4, 5}, NumJ.ones(3, 20).shape()));
+        assertArrayEquals(
+                new int[]{3, 2, 1}, NumJ.ones(3, 4, 5)
+                        .slice(
+                                NdSlice.all(),
+                                NdSlice.interval(1, 3),
+                                NdSlice.point(2))
+                .shape()
+        );
     }
 
     @Test
     public void data() throws Exception {
         assertEquals(
                 NumJ.arange(10, 10).data().toString(),
-                NumJ.arange(10, 10).transpose().slice(NdSlice.interval(3, 7), NdSlice.all()).reshape(40).data().toString()
+                NumJ.arange(10, 10)
+                        .transpose()
+                        .slice(NdSlice.interval(3, 7), NdSlice.all())
+                        .reshape(40)
+                        .data()
+                        .toString()
         );
+        assertNotEquals(NumJ.arange(10, 9).data().toString(), NumJ.arange(10, 10).data().toString());
     }
 
     @Test
@@ -107,7 +180,10 @@ public class NdArrayImplTest {
         NdArray b = a.copy();
         assertFalse(a == b);
         assertEquals(a, b);
-        assertEquals(NumJ.create(new double[]{90, 91,92,93,94,95,96,97,98,99}, 10), a.slice(NdSlice.interval(90,100)).copy());
+        assertEquals(
+                NumJ.create(new double[]{90, 91, 92, 93, 94, 95, 96, 97, 98, 99}, 10)
+                , a.slice(NdSlice.interval(90, 100)).copy()
+        );
     }
 
     @Test
@@ -121,17 +197,17 @@ public class NdArrayImplTest {
                 NumJ.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 3, 4),
                 ones.add(NumJ.arange(4, 1).transpose())
         );
-        assertEquals(NumJ.create(new double[]{0, 2, 4, 6, 8, 10}, new int[]{2, 3}), NumJ.arange(2, 3).add(NumJ.arange(2, 3)));
+        assertEquals(NumJ.create(new double[]{0, 2, 4, 6, 8, 10}, 2, 3), NumJ.arange(2, 3).add(NumJ.arange(2, 3)));
         assertEquals(NumJ.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3), NumJ.arange(2, 3).add(1));
 
         assertEquals(
                 NumJ.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3),
                 NumJ.arange(3, 3)
                         .sub(3)
-                        .slice(new NdIndex[]{
+                        .slice(
                                 new NdIndexInterval(1, 3),
                                 new NdIndexAll()
-                        }).add(1));
+                        ).add(1));
 
         NdArray array1 = NumJ.arange(100, 100).slice(NdSlice.interval(10, 20), NdSlice.interval(20, 30));
         NdArray array2 = NumJ.arange(100, 100).slice(NdSlice.interval(10, 20), NdSlice.interval(20, 30));
@@ -167,11 +243,8 @@ public class NdArrayImplTest {
 
     @Test
     public void div() throws Exception {
-        assertEquals(NumJ.ones(3,4), NumJ.generator(()->4., 3,4).div(4));
-    }
-
-    @Test
-    public void div1() throws Exception {
+        assertEquals(NumJ.ones(3, 4), NumJ.generator(() -> 4., 3, 4).div(4));
+        assertEquals(NumJ.generator(() -> Double.POSITIVE_INFINITY, 3, 4), NumJ.generator(() -> 4., 3, 4).div(0));
     }
 
     @Test
@@ -179,28 +252,37 @@ public class NdArrayImplTest {
         for (int i = 0; i < 12; i++) {
             assertEquals(i, NumJ.arange(3, 4).get(new int[]{i / 4, i % 4}), 1e-5);
         }
+
+        assertEquals(5, NumJ.arange(3, 4, 5)
+                .slice(NdSlice.all(), NdSlice.interval(1, 3), NdSlice.all())
+                .get(new int[]{0, 0, 0}), 1e-5);
+
+        assertEquals(50, NumJ.arange(3, 4, 5)
+                .slice(NdSlice.all(), NdSlice.interval(1, 3), NdSlice.all())
+                .get(new int[]{2, 1, 0}), 1e-5);
+
         NdArray a = NumJ.arange(6000);
         for (int i = 0; i < 6000; i++) {
             assertEquals(i, a.get(new int[]{i}), 1e-5);
             assertEquals(i, a.slice(NdSlice.point(i)).get(new int[]{0}), 1e-5);
             assertEquals(i, a.slice(NdSlice.point(i)).reshape(1, 1).get(new int[]{0, 0}), 1e-5);
         }
-    }
 
-    @Test
-    public void get1() throws Exception {
+        assertEquals(NumJ.create(new double[]{5,7,9,11}, 2,2), NumJ.arange(3,4).get(
+                NdSlice.interval(1,3),
+                NdSlice.set(1,3)
+        ));
     }
 
     @Test
     public void mul() throws Exception {
-    }
-
-    @Test
-    public void mul1() throws Exception {
+        assertEquals(NumJ.generator(()->3., 3,4), NumJ.ones(3,4).mul(3));
+        assertEquals(NumJ.generator(()->1., 3,4), NumJ.ones(3,4).mul(NumJ.ones(3, 4)));
     }
 
     @Test
     public void reshape() throws Exception {
+        assertEquals(NumJ.arange(3, 4), NumJ.arange(2, 6).reshape(3, 4));
     }
 
     @Test
