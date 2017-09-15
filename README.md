@@ -20,7 +20,7 @@ repositories {
 
 
 dependencies {
-    compile 'jp.ac.tsukuba.cs.mdl:numj:0.0.13'
+    compile 'jp.ac.tsukuba.cs.mdl:numj:0.0.20'
 }
 
 ```  
