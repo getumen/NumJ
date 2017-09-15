@@ -77,6 +77,7 @@ public interface NdArray {
     /**
      * ドット積を計算する．状態を変更しない．
      * 機能は<a href='https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html'>numpy.dot</a>と同じ．
+     * a.dot(b)[i,j,k,m] = sum(a[i,j,:] * b[k,:,m])を返す．
      * @param other: 左側のNdArray
      * @return ドット積の結果．
      */
@@ -248,48 +249,59 @@ public interface NdArray {
 
     /**
      * @return 最大の要素のインデックスを返す．
+     * 最大の要素のインデックスを返す
      */
     Integer argmax();
 
     /**
      * @return 指定された座標の最大の要素のインデックスを返す．
+     * 指定された座標の最大の要素のインデックスを返す．
      */
     NdArray argmax(int axis);
 
     /**
+     * @param 座標
      * @return 最小の要素のインデックスを返す．
+     * 最小の要素のインデックスを返す
      */
     Integer argmin();
 
     /**
      * @return 指定された座標の最小の要素のインデックスを返す．
+     * 指定された座標の最小の要素のインデックスを返す．
      */
     NdArray argmin(int axis);
 
     /**
+     * @param 座標
      * @return すべての要素の最大値を返す．
+     * すべての要素の最大値を返す．
      */
     Double max();
 
     /**
      * @param axis 座標
      * @return 指定された座標の要素の最大値を返す．
+     * 指定された座標の要素の最大値を返す．
      */
     NdArray max(int... axis);
 
     /**
      * @return すべての要素の最小値を返す．
+     * すべての要素の最小値を返す．
      */
     Double min();
 
     /**
      * @param axis 座標
      * @return 指定された座標の要素に最小値を返す、
+     * 指定された座標の要素に最小値を返す、
      */
     NdArray min(int... axis);
 
     /**
      * @return すべての要素の和を返す．
+     * すべての要素の和を返す．
      */
     Double sum();
 
