@@ -328,7 +328,7 @@ public interface NdArray {
      * @param coordinate: 座標
      * @return 座標の値．
      */
-    double get(int[] coordinate);
+    double get(int... coordinate);
 
     /**
      * NdArrayを一次元の配列として見た時のindexに対応する値を返す．
