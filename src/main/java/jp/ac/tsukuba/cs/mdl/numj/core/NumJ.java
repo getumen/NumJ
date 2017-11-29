@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.function.IntToDoubleFunction;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * NdArrayを生成するユーティリティクラス
@@ -20,18 +21,22 @@ public class NumJ {
 
     /**
      * すべての要素がvalueで産められたshapeの形を持つNdArrayを生成する．
+     *
      * @param value 要素の値
      * @param shape NdArrayの形
      * @return すべての要素がvalueで産められたshapeの形を持つNdArray
      */
     public static NdArray createByNumber(Number value, int... shape) {
-        double[] array = new double[size(shape)];
-        Arrays.fill(array, value.doubleValue());
-        return new NdArrayImpl(shape, array);
+        NdArray res = new NdArrayImpl(shape);
+        if (value.doubleValue() != 0) {
+            res.elementwise(i -> value.doubleValue());
+        }
+        return res;
     }
 
     /**
      * doubleの配列の要素を持つshapeの形をしたNdArrayを生成する．
+     *
      * @param array 各要素の値を表すdouble型の配列
      * @param shape NdArrayのshape
      * @return NdArray
@@ -42,6 +47,7 @@ public class NumJ {
 
     /**
      * すべての要素が1で埋められたNdArray
+     *
      * @param shape NdArrayのshape
      * @return NdArray
      */
@@ -50,7 +56,8 @@ public class NumJ {
     }
 
     /**
-     すべての要素が0で埋められたNdArray
+     * すべての要素が0で埋められたNdArray
+     *
      * @param shape NdArrayのshape
      * @return NdArray
      */
@@ -61,9 +68,10 @@ public class NumJ {
     /**
      * i番目の要素を指すインデックスを値に変換するラムダ式を用いてNdArrayを生成する
      * <code  class="language-java">
-     *     NumJ.generator(i -> 2.*i, 3,4);
+     * NumJ.generator(i -> 2.*i, 3,4);
      * </code>
-     * @param f 要素を生成する関数
+     *
+     * @param f     要素を生成する関数
      * @param shape NdArrayのshape
      * @return NdArray
      */
@@ -75,9 +83,10 @@ public class NumJ {
     /**
      * 引数を取らないラムダ式を用いてNdArrayを生成する．
      * <code  class="language-java">
-     *     NumJ.generator(()->random.nextDouble(), 3,4);
+     * NumJ.generator(()->random.nextDouble(), 3,4);
      * </code>
-     * @param f ラムダ式
+     *
+     * @param f     ラムダ式
      * @param shape NdArrayのshape
      * @return NdArray
      */
@@ -88,6 +97,7 @@ public class NumJ {
 
     /**
      * 0からsize-1までの要素が順番に並んでshapeの形をしたNdArrayを生成する
+     *
      * @param shape NdArrayのshape
      * @return NdArray
      */
@@ -97,6 +107,7 @@ public class NumJ {
 
     /**
      * 対角要素からk右にずれた要素がが１であるn x mのNdArray
+     *
      * @param n 座標0の要素数
      * @param m 座標1の要素数
      * @param k 要素がいくつずれるか -m,-n < k < m,n
@@ -113,8 +124,8 @@ public class NumJ {
     }
 
     /**
-     *
      * 対角要素からk右にずれた要素がが１であるn x mのNdArray
+     *
      * @param n 正方行列の大きさ
      * @param k 要素がいくつずれるか -n < k < n
      * @return NdArray
@@ -125,6 +136,7 @@ public class NumJ {
 
     /**
      * 単位行列
+     *
      * @param n 大きさ
      * @return NdArray
      */
@@ -134,7 +146,8 @@ public class NumJ {
 
     /**
      * 正規分布に従う乱数から生成されたNdArray
-     * @param mu Gaussの平均
+     *
+     * @param mu    Gaussの平均
      * @param sigma Gaussの標準偏差
      * @param shape NdArrayのshape
      * @return NdArray
@@ -146,6 +159,7 @@ public class NumJ {
 
     /**
      * 一様に従う乱数から生成されたNdArray
+     *
      * @param shape NdArrayのshape
      * @return NdArray
      */

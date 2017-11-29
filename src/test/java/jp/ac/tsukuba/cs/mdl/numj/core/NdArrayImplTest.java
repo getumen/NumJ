@@ -106,6 +106,12 @@ public class NdArrayImplTest {
     }
 
     @Test
+    public void dotN2() {
+        // O(N^3) if in 2 seconds
+        assertArrayEquals(new int[]{1000, 1000}, NumJ.arange(1000, 1000).dot(NumJ.arange(1000, 1000)).shape());
+    }
+
+    @Test
     public void argmax() throws Exception {
         assertEquals(Integer.valueOf(5), NumJ.arange(3, 2).argmax());
         assertEquals(NumJ.ones(3), NumJ.arange(3, 2).argmax(1));
