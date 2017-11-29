@@ -4,7 +4,7 @@ NumJ is N-dimensional Array library for Java that supports parallelized operatio
 NumJ requires JDK 1.8 or higher.
 
 ## Version
-*0.0.22*
+*0.0.23*
 
 ## Documentation
 [Documentation](https://getumen.github.io/NumJ/doc)
@@ -20,7 +20,7 @@ repositories {
 
 
 dependencies {
-    compile 'jp.ac.tsukuba.cs.mdl:numj:0.0.22'
+    compile 'jp.ac.tsukuba.cs.mdl:numj:0.0.23'
 }
 
 ```  
