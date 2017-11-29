@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.function.IntToDoubleFunction;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * NdArrayを生成するユーティリティクラス
@@ -28,10 +27,11 @@ public class NumJ {
      */
     public static NdArray createByNumber(Number value, int... shape) {
         NdArray res = new NdArrayImpl(shape);
-        if (value.doubleValue() != 0) {
-            res.elementwise(i -> value.doubleValue());
+        if (value.doubleValue() == 0) {
+            return res;
+        } else {
+            return res.elementwise(i -> value.doubleValue());
         }
-        return res;
     }
 
     /**
