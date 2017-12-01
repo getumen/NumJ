@@ -90,6 +90,25 @@ class ArangeSample{
 
 ```
 
+### reshape
+大きさ6のベクトルを(2,3)の行列にする
+```java
+import jp.ac.tsukuba.cs.mdl.numj.core.NumJ;
+import jp.ac.tsukuba.cs.mdl.numj.core.NdArray;
+
+class ArangeSample{
+    void reshape(){
+        NdArray v = NumJ.arange(6);
+        java.util.Arrays.equals(
+                new int[]{2, 3},
+                v.reshape(2, 3).shape()
+                );
+    }
+    
+}
+
+```
+
 ### 一様分布(Uniform), ガウス分布(Gaussian)に従う分布から生成された乱数を要素に持つN次元配列は以下のように生成できる．
 ```java
 import jp.ac.tsukuba.cs.mdl.numj.core.NumJ;
