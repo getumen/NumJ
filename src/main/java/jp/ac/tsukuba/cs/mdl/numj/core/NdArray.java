@@ -1,6 +1,5 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import com.google.common.util.concurrent.AtomicDoubleArray;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.BinaryOperator;
@@ -12,12 +11,6 @@ import java.util.function.Predicate;
  * N次元のテンソルを一次元の配列を用いて表し、各要素へのアクセスを定数時間で行うことができる．
  */
 public interface NdArray {
-
-    /**
-     *
-     * @return NdArrayのすべてのデータを返す. not {@code null}
-     */
-    AtomicDoubleArray data();
 
     /**
      * @return NdArrayのshapeを返す．
@@ -264,7 +257,6 @@ public interface NdArray {
     NdArray argmax(int axis);
 
     /**
-     * @param 座標
      * @return 最小の要素のインデックスを返す．
      * 最小の要素のインデックスを返す
      */
@@ -277,7 +269,6 @@ public interface NdArray {
     NdArray argmin(int axis);
 
     /**
-     * @param 座標
      * @return すべての要素の最大値を返す．
      * すべての要素の最大値を返す．
      */

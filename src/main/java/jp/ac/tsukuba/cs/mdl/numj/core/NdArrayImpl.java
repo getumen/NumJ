@@ -1,12 +1,9 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import com.google.common.util.concurrent.AtomicDoubleArray;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -21,26 +18,22 @@ import java.util.stream.IntStream;
  */
 public class NdArrayImpl implements NdArray {
 
-    protected AtomicDoubleArray data;
+    protected double[] data;
 
     protected NdIndexer iterator;
 
 
     public NdArrayImpl(int[] shape) {
         this.iterator = new NdIndexer(shape);
-        this.data = new AtomicDoubleArray(iterator.getSize());
-    }
-
-    public NdArrayImpl(int[] shape, AtomicDoubleArray data) {
-        this.data = data;
-        this.iterator = new NdIndexer(shape);
+        this.data = new double[iterator.getSize()];
     }
 
     public NdArrayImpl(int[] shape, double[] data) {
-        this(shape, new AtomicDoubleArray(data));
+        this.iterator = new NdIndexer(shape);
+        this.data = data;
     }
 
-    public NdArrayImpl(NdIndexer iterator, AtomicDoubleArray data) {
+    public NdArrayImpl(NdIndexer iterator, double[] data) {
         this.data = data;
         this.iterator = iterator;
     }
@@ -69,35 +62,28 @@ public class NdArrayImpl implements NdArray {
                 newShape[i] = Math.max(shape[i], otherShape[i]);
             }
             NdIndexer indexer = new NdIndexer(newShape);
-            AtomicDoubleArray data = new AtomicDoubleArray(
-                    Arrays.stream(newShape).reduce((l, r) -> l * r).orElseThrow(RuntimeException::new));
+            double[] data = new double[NdIndexer.computeSize(newShape)];
 
             IntStream.range(0, indexer.getSize())
                     .parallel()
                     .mapToObj(indexer::coordinate)
                     .forEach(
                             coordinate ->
-                                    data.lazySet(
-                                            indexer.pointer(coordinate),
+                                    data[indexer.pointer(coordinate)] =
                                             op.apply(
                                                     this.broadcastGet(coordinate),
                                                     other.broadcastGet(coordinate)
                                             )
-                                    )
                     );
             return new NdArrayImpl(indexer, data);
         } else {
-            AtomicDoubleArray data = new AtomicDoubleArray(size());
+            double[] data = new double[size()];
             NdIndexer indexer = new NdIndexer(shape());
             IntStream
                     .range(0, size())
                     .parallel()
                     .forEach(
-                            index ->
-                                    data.lazySet(
-                                            index,
-                                            op.apply(this.get(index), other.get(index))
-                                    )
+                            index -> data[index] = op.apply(this.get(index), other.get(index))
                     );
             return new NdArrayImpl(indexer, data);
         }
@@ -105,18 +91,15 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray elementwise(Number value, BinaryOperator<Double> op) {
-        AtomicDoubleArray data = new AtomicDoubleArray(size());
+        double[] data = new double[size()];
         NdIndexer indexer = new NdIndexer(shape());
         IntStream
                 .range(0, size())
                 .parallel()
                 .forEach(index ->
-                        data.lazySet(
-                                index,
-                                op.apply(
-                                        this.get(index),
-                                        value.doubleValue()
-                                )
+                        data[index] = op.apply(
+                                this.get(index),
+                                value.doubleValue()
                         )
                 );
         return new NdArrayImpl(indexer, data);
@@ -125,14 +108,11 @@ public class NdArrayImpl implements NdArray {
     @Override
     public NdArray elementwise(Function<Double, Double> op) {
         NdIndexer indexer = new NdIndexer(shape());
-        AtomicDoubleArray data = new AtomicDoubleArray(size());
+        double[] data = new double[size()];
         IntStream.range(0, size())
                 .parallel()
                 .forEach(index ->
-                        data.lazySet(
-                                index,
-                                op.apply(this.get(index))
-                        )
+                        data[index] = op.apply(this.get(index))
                 );
         return new NdArrayImpl(indexer, data);
     }
@@ -143,11 +123,7 @@ public class NdArrayImpl implements NdArray {
                 .parallel()
                 .mapToObj(iterator::coordinate)
                 .forEach(
-                        coordinate ->
-                                data.lazySet(
-                                        iterator.pointer(coordinate),
-                                        op.apply(coordinate)
-                                )
+                        coordinate -> data[iterator.pointer(coordinate)] = op.apply(coordinate)
                 );
         return this;
     }
@@ -156,7 +132,7 @@ public class NdArrayImpl implements NdArray {
     public Double axisOperation(BinaryOperator<Double> op) {
         return Arrays.stream(iterator.getPointers())
                 .parallel()
-                .mapToDouble(i -> data.get(i))
+                .mapToDouble(i -> data[i])
                 .reduce(op::apply)
                 .orElseThrow(RuntimeException::new);
     }
@@ -165,7 +141,7 @@ public class NdArrayImpl implements NdArray {
     public Integer axisArgOperation(BinaryOperator<Pair<Integer, Double>> op) {
         return IntStream.range(0, size())
                 .parallel()
-                .mapToObj(i -> Pair.of(i, data.get(pointer(i))))
+                .mapToObj(i -> Pair.of(i, data[pointer(i)]))
                 .reduce(op)
                 .map(Pair::getLeft)
                 .orElseThrow(RuntimeException::new);
@@ -247,18 +223,13 @@ public class NdArrayImpl implements NdArray {
     }
 
     @Override
-    public AtomicDoubleArray data() {
-        return data;
-    }
-
-    @Override
     public NdArray copy() {
         return new NdArrayImpl(
                 iterator.getShape(),
                 IntStream
                         .range(0, size())
                         .parallel()
-                        .mapToDouble(i -> data.get(iterator.indexToPointer(i)))
+                        .mapToDouble(i -> data[iterator.indexToPointer(i)])
                         .toArray());
     }
 
@@ -419,12 +390,12 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public double get(int... coordinate) {
-        return data.get(iterator.pointer(coordinate));
+        return data[iterator.pointer(coordinate)];
     }
 
     @Override
     public double get(int index) {
-        return data.get(iterator.indexToPointer(index));
+        return data[iterator.indexToPointer(index)];
     }
 
     @Override
@@ -432,7 +403,7 @@ public class NdArrayImpl implements NdArray {
         if (coordinate.length != dim()) {
             throw new IllegalArgumentException();
         }
-        return data.get(iterator.broadcastPointer(coordinate));
+        return data[iterator.broadcastPointer(coordinate)];
     }
 
     @Override
@@ -505,12 +476,12 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public void conditionalPut(Predicate<Double> f, double value) {
-        Arrays.stream(iterator.getPointers()).parallel().filter(p -> f.test(data.get(p))).forEach(p -> data.lazySet(p, value));
+        Arrays.stream(iterator.getPointers()).parallel().filter(p -> f.test(data[p])).forEach(p -> data[p] = value);
     }
 
     @Override
     public NdArray where(Predicate<Double> op) {
-        return this.copy().elementwisei(coordinate -> op.test(data.get(iterator.pointer(coordinate))) ? 1. : 0.);
+        return this.copy().elementwisei(coordinate -> op.test(data[iterator.pointer(coordinate)]) ? 1. : 0.);
     }
 
     @Override
@@ -547,7 +518,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public void put(int[] coodinate, double value) {
-        data.lazySet(iterator.pointer(coodinate), value);
+        data[iterator.pointer(coodinate)] = value;
     }
 
     @Override
@@ -557,7 +528,7 @@ public class NdArrayImpl implements NdArray {
                 .range(0, iterator.getSize())
                 .parallel()
                 .mapToObj(iterator::coordinate)
-                .forEach(cords -> data.lazySet(iterator.pointer(cords), array.get(cords)));
+                .forEach(cords -> data[iterator.pointer(cords)] = array.get(cords));
     }
 
     @Override
@@ -593,7 +564,11 @@ public class NdArrayImpl implements NdArray {
             if (index == dim() - 2) {
                 sb.append("[");
                 for (int j = 0; j < iterator.getShape()[dim() - 1]; j++) {
-                    sb.append(data.get(iterator.pointer(Ints.concat(channel, new int[]{i, j}))));
+                    sb.append(data[
+                            iterator.pointer(
+                                    Ints.concat(channel, new int[]{i, j})
+                            )
+                            ]);
                     sb.append(", ");
                 }
                 sb.append("]");
@@ -614,8 +589,8 @@ public class NdArrayImpl implements NdArray {
         } else {
             StringBuffer sb = new StringBuffer();
             sb.append("[ ");
-            for (int i = 0; i < data.length(); i++) {
-                sb.append(data.get(i));
+            for (int i = 0; i < data.length; i++) {
+                sb.append(data[i]);
                 sb.append(", ");
             }
             sb.append("]");

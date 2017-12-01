@@ -167,20 +167,6 @@ public class NdArrayImplTest {
     }
 
     @Test
-    public void data() throws Exception {
-        assertEquals(
-                NumJ.arange(10, 10).data().toString(),
-                NumJ.arange(10, 10)
-                        .transpose()
-                        .slice(NdSlice.interval(3, 7), NdSlice.all())
-                        .reshape(40)
-                        .data()
-                        .toString()
-        );
-        assertNotEquals(NumJ.arange(10, 9).data().toString(), NumJ.arange(10, 10).data().toString());
-    }
-
-    @Test
     public void copy() throws Exception {
         NdArray a = NumJ.arange(100);
         NdArray b = a.copy();
