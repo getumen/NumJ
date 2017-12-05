@@ -143,7 +143,7 @@ class NdIndexer {
         int index = 0;
 
         for (int i = 0; i < dim; i++) {
-            index += (dimPointer[permute[i]][coordinate[i]% shape[permute[i]]] ) * stride[permute[i]];
+            index += (dimPointer[permute[i]][coordinate[i] % shape[permute[i]]]) * stride[permute[i]];
         }
         return index;
     }

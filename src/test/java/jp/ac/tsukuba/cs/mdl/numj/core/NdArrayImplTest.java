@@ -68,6 +68,8 @@ public class NdArrayImplTest {
 
         NdArray array1 = NumJ.arange(100, 100).slice(NdSlice.interval(10, 20), NdSlice.interval(20, 30));
         NdArray array2 = NumJ.arange(100, 100).slice(NdSlice.interval(10, 20), NdSlice.interval(20, 30));
+        assertArrayEquals(new int[]{10,10}, array1.transpose().dot(array2).shape());
+
         assertEquals(NumJ.create(new double[]{22434000, 22448700, 22463400, 22478100, 22492800, 22507500,
                 22522200, 22536900, 22551600, 22566300,
                 22448700, 22463410, 22478120, 22492830, 22507540, 22522250,
