@@ -2,7 +2,6 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
-import javax.swing.plaf.SliderUI;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -107,7 +106,7 @@ public class NdArrayImplTest {
 
     @Test
     public void dotN2() {
-        // O(N^3) if in 2 seconds
+        // O(N^2) if in 2 seconds
         assertArrayEquals(new int[]{1000, 1000}, NumJ.arange(1000, 1000).dot(NumJ.arange(1000, 1000)).shape());
     }
 
@@ -242,22 +241,22 @@ public class NdArrayImplTest {
     @Test
     public void get() throws Exception {
         for (int i = 0; i < 12; i++) {
-            assertEquals(i, NumJ.arange(3, 4).get(new int[]{i / 4, i % 4}), 1e-5);
+            assertEquals(i, NumJ.arange(3, 4).get(i / 4, i % 4), 1e-5);
         }
 
         assertEquals(5, NumJ.arange(3, 4, 5)
                 .slice(NdSlice.all(), NdSlice.interval(1, 3), NdSlice.all())
-                .get(new int[]{0, 0, 0}), 1e-5);
+                .get(0, 0, 0), 1e-5);
 
         assertEquals(50, NumJ.arange(3, 4, 5)
                 .slice(NdSlice.all(), NdSlice.interval(1, 3), NdSlice.all())
-                .get(new int[]{2, 1, 0}), 1e-5);
+                .get(2, 1, 0), 1e-5);
 
         NdArray a = NumJ.arange(6000);
         for (int i = 0; i < 6000; i++) {
             assertEquals(i, a.get(new int[]{i}), 1e-5);
             assertEquals(i, a.slice(NdSlice.point(i)).get(new int[]{0}), 1e-5);
-            assertEquals(i, a.slice(NdSlice.point(i)).reshape(1, 1).get(new int[]{0, 0}), 1e-5);
+            assertEquals(i, a.slice(NdSlice.point(i)).reshape(1, 1).get(0, 0), 1e-5);
         }
 
         assertEquals(NumJ.create(new double[]{5,7,9,11}, 2,2), NumJ.arange(3,4).get(
