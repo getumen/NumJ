@@ -2,7 +2,6 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
-import javax.swing.plaf.SliderUI;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;

@@ -5,8 +5,4 @@ import java.util.Optional;
 /**
  * NdArrayのスライスのためのインターフェイス
  */
-public interface NdIndex {
-
-    Optional<Integer> map(Integer i);
-
-}
+public interface NdIndex { }

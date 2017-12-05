@@ -1,21 +1,13 @@
 package jp.ac.tsukuba.cs.mdl.numj.core;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * N次配列を１次配列にマッピングするクラス
  */
-public class NdIndexer {
-
-    private int[] pointers;
+class NdIndexer {
 
     private int dim;
 
@@ -25,55 +17,56 @@ public class NdIndexer {
 
     private int[] stride;
 
-    public static int computeSize(int[] shape) {
+    private int[] permute;
+
+    private int[][] dimPointer;
+
+    private NdIndexer parent;
+
+    NdIndexer(int[] shape) {
+        this(null, shape);
+    }
+
+    NdIndexer(NdIndexer parent, int[] shape) {
+        this(parent, shape, createStride(shape), IntStream.range(0, shape.length).toArray(), createNewDimPointer(shape));
+    }
+
+    NdIndexer(NdIndexer parent, int[] shape, int[] stride, int[] permute, int[][] dimPointer) {
+
+        this.parent = parent;
+
+        dim = shape.length;
+
+        this.shape = shape;
+
+        this.stride = stride;
+
+        this.permute = permute;
+
+        this.dimPointer = dimPointer;
+
+        size = computeSize(shape);
+
+
+    }
+
+    void printState() {
+        System.out.println(this);
+    }
+
+    static int computeSize(int[] shape) {
         return Arrays.stream(shape).reduce((l, r) -> l * r).orElse(0);
     }
 
-    public NdIndexer(int[] shape) {
-
-        dim = shape.length;
-
-        this.shape = shape;
-
-        stride = createStride(shape);
-
-        size = computeSize(shape);
-
-        this.pointers = IntStream.range(0, size).toArray();
-    }
-
-    public NdIndexer(int[] shape, int[] pointers) {
-
-        dim = shape.length;
-
-        this.shape = shape;
-
-        this.stride = createStride(shape);
-
-        size = computeSize(shape);
-
-        this.pointers = pointers;
-    }
-
-    public NdIndexer transpose(int... permute) {
-        int[] newPointers = new int[size];
-        int[] newShape = new int[dim];
-        for (int i = 0; i < dim; i++) {
-            newShape[i] = shape[permute[i]];
+    static int[][] createNewDimPointer(int[] shape) {
+        int[][] newDimPointer = new int[shape.length][];
+        for (int i = 0; i < shape.length; ++i) {
+            newDimPointer[i] = IntStream.range(0, shape[i]).toArray();
         }
-        int[] newStride = createStride(newShape);
-        for (int i = 0; i < size; i++) {
-            int[] coordinate = coordinate(i);
-            newPointers[IntStream.range(0, dim).map(j -> coordinate[permute[j]] * newStride[j]).sum()] = pointers[i];
-        }
-        return new NdIndexer(newShape, newPointers);
+        return newDimPointer;
     }
 
-    public NdIndexer reshape(int... shape) {
-        return new NdIndexer(shape, pointers);
-    }
-
-    public static int[] createStride(int... shape) {
+    static int[] createStride(int... shape) {
         int[] stride = new int[shape.length];
         stride[shape.length - 1] = 1;
         for (int i = shape.length - 2; i >= 0; i--) {
@@ -82,128 +75,153 @@ public class NdIndexer {
         return stride;
     }
 
-    public int pointer(int[] coordinate) {
+    NdIndexer transpose(int... permute) {
+        int[] newPermute = new int[dim];
+        for (int i = 0; i < dim; i++) {
+            newPermute[i] = this.permute[permute[i]];
+        }
+        return new NdIndexer(parent, shape, stride, newPermute, dimPointer);
+    }
+
+    NdIndexer reshape(int... shape) {
+        return new NdIndexer(this, shape);
+    }
+
+    @Override
+    public String toString() {
+        return "NdIndexer{" +
+                "dim=" + dim +
+                ", size=" + size +
+                ", shape=" + Arrays.toString(shape) +
+                ", stride=" + Arrays.toString(stride) +
+                ", permute=" + Arrays.toString(permute) +
+                ", dimPointer=" + Arrays.toString(dimPointer) +
+                ", parent=" + parent +
+                '}';
+    }
+
+    int pointer(int[] coordinate) {
         if (dim != coordinate.length) {
             throw new IllegalArgumentException("Dimension not match " + dim + " != " + coordinate.length);
         }
         int index = 0;
-        for (int i = 0; i < dim; i++) {
-            index += coordinate[i] * stride[i];
+        if (parent != null) {
+            return pointer(index(coordinate));
         }
-        return pointers[index];
+        for (int i = 0; i < dim; i++) {
+            index += dimPointer[permute[i]][coordinate[i]] * stride[permute[i]];
+        }
+        return index;
     }
 
-    public int broadcastPointer(int[] coordinate) {
+    int index(int... coordinate) {
         int index = 0;
+        int[] vStride = createStride(shape);
         for (int i = 0; i < dim; i++) {
-            index += (coordinate[i] % shape[i]) * stride[i];
+            index += coordinate[permute[i]] * vStride[permute[i]];
         }
-        return pointers[index];
+        return index;
     }
 
-    /**
-     * pointer to index O(log N)
-     * slow!
-     *
-     * @param pointer: ポインタ．
-     * @return インデックス
-     */
-    public int pointerToIndex(int pointer) {
-        return Arrays.binarySearch(pointers, pointer);
+    Stream<Integer> stream() {
+        return IntStream.range(0, size).map(this::pointer).boxed();
     }
 
-    public int indexToPointer(int index) {
-        return pointers[index];
+    Stream<Integer> parallelStream() {
+        return IntStream.range(0, size).parallel().map(this::pointer).boxed();
     }
 
-    public int[] coordinate(int index) {
+    int pointer(int index) {
+        if (parent == null) {
+            return pointer(viewCoordinate(index));
+        } else {
+            return parent.pointer(index);
+        }
+    }
+
+    int broadcastPointer(int[] coordinate) {
+        int index = 0;
+
+        for (int i = 0; i < dim; i++) {
+            index += (dimPointer[permute[i]][coordinate[i]% shape[permute[i]]] ) * stride[permute[i]];
+        }
+        return index;
+    }
+
+    int[] viewCoordinate(int index) {
+        int[] result = new int[dim];
+        int[] vStride = createStride(shape);
+        int[] inv = new int[dim];
+        for (int i = 0; i < dim; i++) {
+            inv[permute[i]] = i;
+        }
+        for (int i = 0; i < dim - 1; i++) {
+            result[inv[i]] = index / vStride[i];
+            index %= vStride[i];
+        }
+        result[inv[dim - 1]] = index;
+        return result;
+    }
+
+
+    int[] coordinate(int index) {
         int[] result = new int[dim];
         for (int i = 0; i < dim; i++) {
-            result[i] = index / stride[i];
-            index %= stride[i];
+            result[permute[i]] = index / stride[permute[i]];
+            index %= stride[permute[i]];
         }
         return result;
     }
 
-    public int[] getPointers() {
-        return pointers;
-    }
-
-    public NdIndexer slice(NdIndex[] indices) {
+    NdIndexer slice(NdIndex... indices) {
         if (indices.length != dim) {
             throw new IllegalArgumentException();
         }
 
-        int[] shape = new int[dim];
-        List<List<Integer>> lst = Lists.newArrayList();
-        for (int i = 0; i < dim; i++) {
-            List<Integer> l = Lists.newArrayList();
+        int[] newShape = new int[dim];
+        int[][] newDimPointer = new int[dim][];
+        for (int j = 0; j < dim; j++) {
+            final int i = j;
+            final int cj = permute[j];
             if (indices[i] instanceof NdIndexPoint) {
-                l.add(((NdIndexPoint) indices[i]).getPoint());
+                NdIndexPoint point = (NdIndexPoint) indices[i];
+                newShape[cj] = 1;
+                newDimPointer[cj] = new int[]{dimPointer[cj][point.getPoint()]};
             } else if (indices[i] instanceof NdIndexInterval) {
                 NdIndexInterval interval = (NdIndexInterval) indices[i];
-                for (int j = interval.getStart(); j < interval.getEnd(); j++) {
-                    l.add(j);
-                }
-            } else {
-                for (int j = 0; j < this.shape[i]; j++) {
-                    indices[i].map(j).ifPresent(l::add);
-                }
+                newShape[cj] = interval.getEnd() - interval.getStart();
+                newDimPointer[cj] = IntStream.range(interval.getStart(), interval.getEnd()).map(p -> dimPointer[cj][p]).toArray();
+            } else if (indices[i] instanceof NdIndexAll) {
+                newShape[cj] = shape[cj];
+                newDimPointer[cj] = dimPointer[cj];
+            } else if (indices[i] instanceof NdIndexSet) {
+                NdIndexSet set = (NdIndexSet) indices[i];
+                newShape[cj] = set.getSet().length;
+                newDimPointer[cj] = Arrays.stream(set.getSet()).map(p -> dimPointer[cj][p]).toArray();
             }
-            shape[i] = l.size();
-            lst.add(l);
         }
 
-        List<Integer> newPointer = Lists.newArrayList();
-        for (List<Integer> coordinate : Lists.cartesianProduct(lst)) {
-            newPointer.add(pointer(Ints.toArray(coordinate)));
-        }
-
-        return new NdIndexer(shape, Ints.toArray(newPointer));
+        return new NdIndexer(parent, newShape, stride, permute, newDimPointer);
     }
 
-    public int getDim() {
+    int getDim() {
         return dim;
     }
 
 
-    public int getSize() {
+    int getSize() {
         return size;
     }
 
-    public int[] getShape() {
-        int[] shapeView = new int[dim];
+    int[] getShape() {
+        int[] v = new int[dim];
         for (int i = 0; i < dim; i++) {
-            shapeView[i] = shape[i];
+            v[i] = shape[permute[i]];
         }
-        return shapeView;
+        return v;
     }
 
-    public int[] getStride() {
+    int[] getStride() {
         return stride;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        NdIndexer indexer = (NdIndexer) o;
-
-        if (dim != indexer.dim) return false;
-        if (size != indexer.size) return false;
-        if (!Arrays.equals(pointers, indexer.pointers)) return false;
-        if (!Arrays.equals(shape, indexer.shape)) return false;
-        return Arrays.equals(stride, indexer.stride);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Arrays.hashCode(pointers);
-        result = 31 * result + dim;
-        result = 31 * result + size;
-        result = 31 * result + Arrays.hashCode(shape);
-        result = 31 * result + Arrays.hashCode(stride);
-        return result;
     }
 }

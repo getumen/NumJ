@@ -8,24 +8,16 @@ public class NdIndexInterval implements NdIndex {
 
     private int end;
 
-    public NdIndexInterval(int start, int end) {
+    NdIndexInterval(int start, int end) {
         this.start = start;
         this.end = end;
     }
 
-    public int getStart() {
+    int getStart() {
         return start;
     }
 
-    public int getEnd() {
+    int getEnd() {
         return end;
-    }
-
-    @Override
-    public Optional<Integer> map(Integer i) {
-        if (start <= i && i < end) {
-            return Optional.of(i);
-        }
-        return Optional.empty();
     }
 }

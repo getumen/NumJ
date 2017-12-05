@@ -2,13 +2,12 @@ package jp.ac.tsukuba.cs.mdl.numj.core;
 
 import org.junit.Test;
 
-import java.util.stream.IntStream;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class NdIndexerTest {
 
+    // functional test
     @Test
     public void composite() throws Exception {
         NdIndexer indexer = new NdIndexer(new int[]{10, 20, 30, 40});
@@ -17,12 +16,12 @@ public class NdIndexerTest {
                 indexer.pointer(new int[]{9, 19, 19, 20}),
                 transposed.pointer(new int[]{19, 9, 20, 19})
         );
-        NdIndexer sliced = transposed.slice(new NdIndex[]{
+        NdIndexer sliced = transposed.slice(
                 new NdIndexInterval(10, 20),
                 new NdIndexAll(),
                 new NdIndexSet(2, 4, 6, 8, 10, 12, 14, 16, 18, 20),
                 new NdIndexAll()
-        });
+        );
         assertEquals(
                 indexer.pointer(new int[]{9, 19, 19, 20}),
                 sliced.pointer(new int[]{9, 9, 9, 19})
@@ -30,8 +29,8 @@ public class NdIndexerTest {
         assertArrayEquals(new int[]{10, 10, 10, 20}, sliced.getShape());
         NdIndexer reshaped = sliced.reshape(20000);
         assertEquals(
-                indexer.pointer(new int[]{9, 19, 19, 20 }),
-                reshaped.pointer(new int[]{19999}) // java.lang.IllegalArgumentException at NdIndexerTest.java:34
+                indexer.pointer(new int[]{9, 19, 19, 20}),
+                reshaped.pointer(new int[]{19999})
         );
         NdIndexer tmp = reshaped.reshape(10, 10, 10, 20).transpose(1, 3, 0, 2);
         assertEquals(
@@ -58,9 +57,17 @@ public class NdIndexerTest {
     }
 
     @Test
-    public void pointers() throws Exception {
+    public void index() throws Exception {
         NdIndexer indexer = new NdIndexer(new int[]{3, 4, 5});
-        assertArrayEquals(IntStream.range(0, 3 * 4 * 5).toArray(), indexer.getPointers());
+        assertEquals(0, indexer.index(0, 0, 0));
+        assertEquals(26, indexer.index(1, 1, 1));
+    }
+
+    @Test
+    public void indexAndCoordinate() {
+        NdIndexer indexer = new NdIndexer(new int[]{3, 4, 5});
+        assertEquals(0, indexer.index(indexer.coordinate(0)));
+        assertEquals(26, indexer.index(indexer.coordinate(26)));
     }
 
     @Test
@@ -70,11 +77,11 @@ public class NdIndexerTest {
         /*
         Index All Test
          */
-        NdIndexer sliceAll = indexer.slice(new NdIndex[]{
+        NdIndexer sliceAll = indexer.slice(
                 new NdIndexAll(),
                 new NdIndexAll(),
                 new NdIndexAll()
-        });
+        );
         assertEquals(5 * 6 * 7, sliceAll.getSize());
         assertEquals(3, sliceAll.getDim());
         assertArrayEquals(new int[]{5, 6, 7}, sliceAll.getShape());
@@ -87,12 +94,11 @@ public class NdIndexerTest {
         /*
         Index Interval
          */
-        NdIndexer sliceInterval = indexer.slice(new NdIndex[]{
+        NdIndexer sliceInterval = indexer.slice(
                 new NdIndexInterval(1, 3),
                 new NdIndexInterval(1, 4),
                 new NdIndexInterval(1, 5)
-        });
-        assertEquals(2 * 3 * 4, sliceInterval.getPointers().length);
+        );
         assertEquals(2 * 3 * 4, sliceInterval.getSize());
         assertEquals(3, sliceInterval.getDim());
         assertArrayEquals(new int[]{2, 3, 4}, sliceInterval.getShape());
@@ -100,23 +106,15 @@ public class NdIndexerTest {
                 indexer.pointer(new int[]{2, 3, 4}),
                 sliceInterval.pointer(new int[]{1, 2, 3})
         );
-        assertArrayEquals(
-                new int[]{1, 2, 3},
-                sliceInterval.coordinate(
-                        sliceInterval.pointerToIndex(
-                                sliceInterval.pointer(new int[]{1, 2, 3})
-                        )
-                )
-        );
 
         /*
         Index Set
          */
-        NdIndexer sliceSet = indexer.slice(new NdIndex[]{
+        NdIndexer sliceSet = indexer.slice(
                 new NdIndexSet(1, 3),
                 new NdIndexSet(1, 3, 5),
                 new NdIndexSet(1, 2, 4, 6)
-        });
+        );
         assertEquals(2 * 3 * 4, sliceSet.getSize());
         assertEquals(3, sliceSet.getDim());
         assertArrayEquals(new int[]{2, 3, 4}, sliceSet.getShape());
@@ -124,31 +122,21 @@ public class NdIndexerTest {
                 indexer.pointer(new int[]{3, 3, 4}),
                 sliceSet.pointer(new int[]{1, 1, 2})
         );
-        assertArrayEquals(
-                new int[]{1, 2, 3},
-                sliceSet.coordinate(
-                        sliceSet.pointerToIndex(
-                                sliceSet.pointer(new int[]{1, 2, 3})
-                        )
-                )
-        );
+
 
         /*
         point
          */
-        NdIndexer point = indexer.slice(new NdIndex[]{
+        NdIndexer point = indexer.slice(
                 new NdIndexPoint(3),
                 new NdIndexPoint(4),
-                new NdIndexPoint(5),
-        });
+                new NdIndexPoint(5));
         assertEquals(1, point.getSize());
 
         NdIndexer sliceSetSet = sliceSet.slice(
-                new NdIndex[]{
-                        new NdIndexAll(),
-                        new NdIndexInterval(1, 2),
-                        new NdIndexSet(2, 3)
-                }
+                new NdIndexAll(),
+                new NdIndexInterval(1, 2),
+                new NdIndexSet(2, 3)
         );
         assertEquals(
                 indexer.pointer(new int[]{3, 3, 4}),

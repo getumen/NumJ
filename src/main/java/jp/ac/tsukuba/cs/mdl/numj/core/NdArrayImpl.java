@@ -119,19 +119,16 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public NdArray elementwisei(Function<int[], Double> op) {
-        IntStream.range(0, size())
-                .parallel()
-                .mapToObj(iterator::coordinate)
+        iterator.parallelStream()
                 .forEach(
-                        coordinate -> data[iterator.pointer(coordinate)] = op.apply(coordinate)
+                        i -> data[i] = op.apply(iterator.coordinate(i))
                 );
         return this;
     }
 
     @Override
     public Double axisOperation(BinaryOperator<Double> op) {
-        return Arrays.stream(iterator.getPointers())
-                .parallel()
+        return iterator.parallelStream()
                 .mapToDouble(i -> data[i])
                 .reduce(op::apply)
                 .orElseThrow(RuntimeException::new);
@@ -226,10 +223,8 @@ public class NdArrayImpl implements NdArray {
     public NdArray copy() {
         return new NdArrayImpl(
                 iterator.getShape(),
-                IntStream
-                        .range(0, size())
-                        .parallel()
-                        .mapToDouble(i -> data[iterator.indexToPointer(i)])
+                iterator.stream()
+                        .mapToDouble(i -> data[i])
                         .toArray());
     }
 
@@ -258,14 +253,7 @@ public class NdArrayImpl implements NdArray {
             if (shape[shape.length - 1] != otherShape[otherShape.length - 2]) {
                 throw new NdArrayException(this, other);
             }
-            int[] newShape = new int[shape.length + otherShape.length - 2];
-            for (int i = 0; i < shape.length - 1; i++) {
-                newShape[i] = shape[i];
-            }
-            for (int i = 0; i < otherShape.length - 2; i++) {
-                newShape[i + shape.length - 1] = otherShape[i];
-            }
-            newShape[newShape.length - 1] = otherShape[otherShape.length - 1];
+            int[] newShape = computeDotShape(shape, otherShape);
             NdArray result = new NdArrayImpl(newShape);
             int[] otherStride = NdIndexer.createStride(otherShape);
             result.elementwisei(coordinate -> {
@@ -284,6 +272,18 @@ public class NdArrayImpl implements NdArray {
             });
             return result;
         }
+    }
+
+    private int[] computeDotShape(int[] shape, int[] otherShape) {
+        int[] newShape = new int[shape.length + otherShape.length - 2];
+        for (int i = 0; i < shape.length - 1; i++) {
+            newShape[i] = shape[i];
+        }
+        for (int i = 0; i < otherShape.length - 2; i++) {
+            newShape[i + shape.length - 1] = otherShape[i];
+        }
+        newShape[newShape.length - 1] = otherShape[otherShape.length - 1];
+        return newShape;
     }
 
     @Override
@@ -395,7 +395,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public double get(int index) {
-        return data[iterator.indexToPointer(index)];
+        return data[iterator.pointer(index)];
     }
 
     @Override
@@ -476,7 +476,7 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public void conditionalPut(Predicate<Double> f, double value) {
-        Arrays.stream(iterator.getPointers()).parallel().filter(p -> f.test(data[p])).forEach(p -> data[p] = value);
+        iterator.parallelStream().filter(p -> f.test(data[p])).forEach(p -> data[p] = value);
     }
 
     @Override
@@ -600,6 +600,6 @@ public class NdArrayImpl implements NdArray {
 
     @Override
     public int pointer(int index) {
-        return iterator.indexToPointer(index);
+        return iterator.pointer(index);
     }
 }
