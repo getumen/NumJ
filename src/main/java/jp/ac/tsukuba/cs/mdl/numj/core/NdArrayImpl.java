@@ -228,7 +228,6 @@ public class NdArrayImpl implements NdArray {
                 iterator.getShape(),
                 IntStream
                         .range(0, size())
-                        .parallel()
                         .mapToDouble(i -> data[iterator.indexToPointer(i)])
                         .toArray());
     }
