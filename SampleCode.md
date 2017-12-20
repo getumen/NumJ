@@ -227,6 +227,26 @@ class ElementWiseSample{
 }
 ```
 
+## 要素ごとの演算
+```java
+import jp.ac.tsukuba.cs.mdl.numj.core.NumJ;
+import jp.ac.tsukuba.cs.mdl.numj.core.NdArray;
+
+class ElementWiseSample{
+    void cal(){
+        NdArray arange = NumJ.arange(2, 3);
+        System.out.println(arange.elementwise(a -> a+1));
+        /*
+        [
+        [1.0, 2.0, 3.0, ]
+        [4.0, 5.0, 6.0, ]
+        ]
+         */
+    }
+}
+
+```
+
 ## N次元配列とスカラ値の四則演算
 ```java
 import jp.ac.tsukuba.cs.mdl.numj.core.NumJ;
